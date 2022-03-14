@@ -1,0 +1,177 @@
+<template>
+<div class="page">
+	<div class="page-content account-area">
+		<div class="dz-banner"
+			style="background-image:url(img/banner/bnr-2.jpg); background-repeat:no-repeat; background-size:cover;"></div>
+		<div class="dz-banner-height"></div>
+		<div class="fixed-content py-30">
+			<div class="container">
+				<div class="tabs">
+					<div class="tab tab-active form-elements tabs">
+						<form class="tab tab-active" id="tabA1">
+							<div class="title-bar mb-20">
+								<h3 class="dz-title ma-0">Sign In</h3>
+								<a href="/" class="icon-close"><i class="flaticon-cancel"></i></a>
+							</div>
+							<div class="list mb-0">
+								<ul class="row">
+									<li class="item-content item-input col-100 item-input-with-value">
+										<div class="item-inner">
+											<div class="item-input-wrap">
+												<input id="email" type="email" placeholder="Email Address" id="demo-username-22"
+													class="form-control" @input="inputEmail" value="{{email}}" />
+											</div>
+										</div>
+									</li>
+									<li class="item-content item-input col-100">
+										<div class="item-inner">
+											<div class="item-input-wrap">
+												<input id="password" type="password" placeholder="Password" id="demo-password-24"
+													class="form-control" @input="inputPass" value="{{password}}" />
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+							<div class="list">
+								<ul>
+									<li class="mb-20 text-center"><a href="#tabA2" data-route-tab-id="tabA2"
+											class="tab-link fs-14 d-inline-block">Forgot Password?</a></li>
+									<li class="mb-15"><a @click="login" class="button-large button button-fill">Sign In</a></li>
+									<li><a href="/signup/" class="button-large button button-fill">Create an account</a></li>
+								</ul>
+							</div>
+						</form>
+						<form class="tab" id="tabA2">
+							<div class="title-bar mb-20">
+								<h3 class="dz-title ma-0">Forget Password</h3>
+								<a href="#tabA1" data-route-tab-id="tabA1" class="tab-link icon-close"><i
+										class="flaticon-cancel"></i></a>
+							</div>
+							<div class="list mb-0">
+								<ul>
+									<li class="item-content item-input item-input-with-value">
+										<div class="item-inner">
+											<div class="item-input-wrap">
+												<input type="password" placeholder="New Password" id="demo-username-25" class="form-control" />
+											</div>
+										</div>
+									</li>
+									<li><a href="/home/" class="button-large button button-fill">SUBMIT</a></li>
+								</ul>
+							</div>
+							<div class="list text-center">
+								<p class="fs-14 d-inline-block mt-10">Sign in to your registered account <a href="#tabA1"
+										data-route-tab-id="tabA1" class="fw6 tab-link">Login here</a></p>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</template>
+
+<script>
+	return {
+    // Component Data
+    data: function () {
+      // Must return an object
+      return {
+        email: null,
+				password: null
+      }
+    },
+    // Component Methods
+    methods: {
+      login: function () {
+        var self = this;
+
+				self.$app.request({
+          method: 'POST',
+          url: 'https://dc-bogatama.herokuapp.com/users/login',
+          data: {
+						email: self.email,
+						password: self.password
+					},
+					headers: {
+						'Access-Control-Allow-Origin': '*',
+						'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+					},
+					contentType: 'application/json',
+          success: function(res) {
+						const data = JSON.parse(res)
+						self.$root.tesSimpan("user", JSON.stringify(data.data))
+						return app.views.main.router.navigate('/home/');
+          },
+          error: function(err) {
+						let msg = null
+						if(err.response){
+							msg = JSON.parse(err.response)
+						}
+            self.$app.dialog.alert(msg.message || "Error");
+          }
+        })
+      },
+      inputEmail: function (e) {
+        var self = this;
+        self.$setState({
+          email: e.target.value,
+        });
+      },
+			inputPass: function (e) {
+        var self = this;
+        self.$setState({
+          password: e.target.value,
+        });
+      },
+    },
+    // Lifecycle Hooks
+    // beforeCreate() {
+    //   console.log('componentBeforeCreate', this)
+    // },
+    // created() {
+    //   console.log('componentCreated', this)
+    // },
+    // beforeMount() {
+    //   console.log('componentBeforeMount', this)
+    // },
+    // mounted() {
+    //   console.log('componentMounted', this);
+    // },
+    // updated() {
+    //   console.log('componentUpdated', this);
+    // },
+    // beforeDestroy() {
+    //   console.log('componentBeforeDestroy', this);
+    // },
+    // destroyed() {
+    //   console.log('componentDestroyed', this);
+    // },
+    // Page Events
+    // on: {
+    //   pageMounted: function(e, page) {
+    //     console.log('pageMounted', page);
+    //   },
+    //   pageInit: function(e, page) {
+    //     console.log('pageInit', page);
+    //   },
+    //   pageBeforeIn: function(e, page) {
+    //     console.log('pageBeforeIn', page);
+    //   },
+    //   pageAfterIn: function(e, page) {
+    //     console.log('pageAfterIn', page);
+    //   },
+    //   pageBeforeOut: function(e, page) {
+    //     console.log('pageBeforeOut', page);
+    //   },
+    //   pageAfterOut: function(e, page) {
+    //     console.log('pageAfterOut', page);
+    //   },
+    //   pageBeforeRemove: function(e, page) {
+    //     console.log('pageBeforeRemove', page);
+    //   },
+    // }
+  }
+</script>

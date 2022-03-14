@@ -1,0 +1,119 @@
+<template>
+  <div class="page">
+    <div class="page-content account-area">
+      <div class="fixed-content py-30">
+        <div class="container">
+          <div class="tabs">
+            <div class="tab tab-active form-elements tabs">
+              <form class="tab tab-active" id="tabA1">
+                <div class="title-bar mb-20">
+                  <h3 class="dz-title ma-0">Edit Kategori Produk</h3>
+                  <a href="/product-type/" class="icon-close"><i class="flaticon-cancel"></i></a>
+                </div>
+                <div class="list mb-0">
+                  <ul class="row">
+                    <li class="item-content item-input col-100 item-input-with-value">
+                      <div class="item-inner">
+                        <div class="item-input-wrap">
+                          <input id="name" type="text" placeholder="Nama Kategori Produk" id="demo-username-22"
+                            class="form-control" @input="inputName" value="{{name}}" />
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="list">
+                  <ul>
+                    <li class="mb-15"><a @click="update" class="button-large button button-fill">Confirm</a></li>
+                  </ul>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </template>
+  
+  <script>
+    return {
+      // Component Data
+      data: function () {
+        // Must return an object
+        return {
+          id: 0,
+          name: null
+        }
+      },
+      // Component Methods
+      methods: {
+        update: function () {
+          var self = this;
+  
+          self.$app.request({
+            method: 'PUT',
+            url: `https://dc-bogatama.herokuapp.com/product-types/${self.id}`,
+            data: {
+              name: self.name
+            },
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+            },
+            contentType: 'application/json',
+            success: function(res) {
+              self.$app.dialog.alert("Kategori Produk berhasil diupdate")
+              return app.views.main.router.navigate('/product-type/');
+            },
+            error: function(err) {
+              let msg = null
+              if(err.response){
+                msg = JSON.parse(err.response)
+              }
+              self.$app.dialog.alert(msg.message || "Error");
+            }
+          })
+        },
+        inputName: function (e) {
+          var self = this;
+          self.$setState({
+            name: e.target.value,
+          });
+        },
+      },
+      on: {
+      pageInit: function () {
+        var self = this;
+        const id = self.$root.tesBaca("id-pt")
+        if(!id){
+          self.$app.dialog.alert("Kategori Produk tidak terdaftar")
+          return app.views.main.router.navigate('/product-type/');
+        }
+        self.$app.request({
+          method: 'GET',
+          url: `https://dc-bogatama.herokuapp.com/product-types/${id}`,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            self.$setState({
+              name: data.data.name,
+              id: id,
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.message || "Error");
+          }
+        })
+      }
+    }
+    }
+  </script>

@@ -1,0 +1,107 @@
+<template>
+  <div class="page">
+    <div class="navbar navbar-style-1">
+      <div class="navbar-bg"></div>
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="/home/" class="link">
+            <i class="icon flaticon-left"></i>
+          </a>
+        </div>
+        <div class="title">Kategori Produk</div>
+        <div class="right">
+          <a href="/new-product-type/" class="button button-fill color-green">+</a>
+        </div>
+      </div>
+    </div>
+    <div class="page-content content-area pt-80">
+      <div class="container">
+        {{#each list}}
+        <div class="card card-bx noti-area">
+          <div class="item-title"><i class="text-success"></i>{{name}}</div>
+          <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
+          <div class="item-time">
+            <span class="text-dark" @click="delete({{id}})"><i class="fa fa-trash-o"></i> Delete</span>
+            <span class="text-primary" @click="updatePage({{id}})">Edit</span>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  return {
+    // Component Data
+    data: function () {
+      // Must return an object
+      return {
+        list: [],
+      }
+    },
+    // Component Methods
+    methods: {
+      delete: function (id) {
+        var self = this;
+        self.$app.dialog.confirm(
+          "Apakah anda yakin ingin menghapus Kategori Produk ini?",
+          "Confirmation",
+          function () {
+            self.$app.request({
+              method: 'DELETE',
+              url: `https://dc-bogatama.herokuapp.com/product-types/${id}`,
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+              },
+              success: function (res) {
+                self.$app.dialog.alert("Kategori Produk berhasil dihapus")
+                return app.views.main.router.refreshPage();
+              },
+              error: function (err) {
+                let msg = null
+                if (err.response) {
+                  msg = JSON.parse(err.response)
+                }
+                self.$app.dialog.alert(msg.message || "Error");
+              }
+            })
+          }
+        );
+      },
+      updatePage: function (id) {
+        var self = this;
+        self.$root.tesSimpan("id-pt", id)
+        return app.views.main.router.navigate('/edit-product-type/');
+      }
+    },
+    on: {
+      pageInit: function () {
+        var self = this;
+        self.$app.request({
+          method: 'GET',
+          url: 'https://dc-bogatama.herokuapp.com/product-types/',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            self.$setState({
+              list: data.data,
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.message || "Error");
+          }
+        })
+      }
+    }
+  }
+</script>

@@ -1,0 +1,19 @@
+{
+  "cwd": "/home/azinudin/Documents/work/non-office/personal/bagas",
+  "type": [
+    "web",
+    "pwa"
+  ],
+  "name": "tes",
+  "framework": "core",
+  "template": "blank",
+  "bundler": false,
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkTheme": false,
+    "iconFonts": false,
+    "fillBars": false
+  },
+  "customBuild": false
+}
