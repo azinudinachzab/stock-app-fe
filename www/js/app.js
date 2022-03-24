@@ -12,7 +12,7 @@ Framework7.use(debugPlugin);
 
 // Init App
 var app = new Framework7({
-  id: 'io.framework7.testapp',
+  id: 'io.framework7.bagas-stock',
   root: '#app',
   theme: theme,
   view : {
@@ -22,6 +22,7 @@ var app = new Framework7({
   cache: false,
   data: function () {
     return {
+      baseApiUrl: 'http://localhost:3000',
       user: {
         firstName: 'DC',
         lastName: 'Bogatama',

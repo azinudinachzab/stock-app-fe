@@ -1,0 +1,220 @@
+<template>
+  <div class="page">
+    <div class="page-content account-area">
+      <div class="fixed-content py-30">
+        <div class="container">
+          <div class="tabs">
+            <div class="tab tab-active form-elements tabs">
+              <form class="tab tab-active" id="tabA1">
+                <div class="title-bar mb-20">
+                  <h3 class="dz-title ma-0">Edit Produk</h3>
+                  <a href="/product/" class="icon-close"><i class="flaticon-cancel"></i></a>
+                </div>
+                <div class="list mb-0">
+                  <ul class="row">
+                    <li class="item-content item-input col-100">
+                        <div class="item-inner">
+                            <div class="item-title">Kategori Produk</div>
+                            <div class="item-input-wrap input-dropdown-wrap">
+                                <select @change="selectProductType" placeholder="Pilih Kategori Produk" required>
+                                    <option value="">-- Pilih --</option>
+                                    {{#each product_type_list}}
+                                        {{#if "product_type_id==id"}}
+                                            <option value="{{id}}" selected>{{name}}</option>
+                                        {{else}}
+                                            <option value="{{id}}">{{name}}</option>
+                                        {{/if}}
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input col-100">
+                        <div class="item-inner">
+                            <div class="item-title">Brand</div>
+                            <div class="item-input-wrap input-dropdown-wrap">
+                                <select @change="selectBrand" placeholder="Pilih Brand" required>
+                                    <option value="">-- Pilih --</option>
+                                    {{#each brand_list}}
+                                        {{#if "brand_id==id"}}
+                                            <option value="{{id}}" selected>{{name}}</option>
+                                        {{else}}
+                                            <option value="{{id}}">{{name}}</option>
+                                        {{/if}}
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input col-100 item-input-with-value">
+                      <div class="item-inner">
+                        <div class="item-input-wrap">
+                          <input id="name" type="text" placeholder="Nama Produk" id="demo-username-22"
+                            class="form-control" @input="inputName" value="{{name}}" />
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="list">
+                  <ul>
+                    <li class="mb-15"><a @click="update" class="button-large button button-fill">Confirm</a></li>
+                  </ul>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </template>
+  
+  <script>
+    return {
+      // Component Data
+      data: function () {
+        // Must return an object
+        return {
+            product_type_list: {},
+            brand_list: {},
+            id: 0,
+            name: null,
+            product_type_id: null,
+            brand_id: null,
+        }
+      },
+      // Component Methods
+      methods: {
+        update: function () {
+          var self = this;
+  
+          self.$app.request({
+            method: 'PUT',
+            url: `${self.$app.data.baseApiUrl}/products/${self.id}`,
+            data: {
+              name: self.name,
+              product_type_id: self.product_type_id,
+              brand_id: self.brand_id,
+            },
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+            },
+            contentType: 'application/json',
+            success: function(res) {
+              self.$app.dialog.alert("Produk berhasil diupdate")
+              return app.views.main.router.navigate('/product/');
+            },
+            error: function(err) {
+              let msg = null
+              if(err.response){
+                msg = JSON.parse(err.response)
+              }
+              self.$app.dialog.alert(msg.message || "Error");
+            }
+          })
+        },
+        inputName: function (e) {
+            let self = this;
+            self.$setState({
+                name: e.target.value,
+            });
+        },
+        selectProductType: function (e) {
+            let self = this;
+            self.$setState({
+                product_type_id: e.target.value,
+            })
+        },
+        selectBrand: function (e) {
+            let self = this;
+            self.$setState({
+                brand_id: e.target.value,
+            })
+        }
+      },
+      on: {
+      pageInit: function () {
+        var self = this;
+        const id = self.$root.tesBaca("id-pt");
+        if(!id){
+          self.$app.dialog.alert("Produk tidak terdaftar")
+          return app.views.main.router.navigate('/product/');
+        }
+
+        self.$app.request({
+          method: 'GET',
+          url: `${self.$app.data.baseApiUrl}/products/${id}`,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            self.$setState({
+                name: data.data.name,
+                product_type_id: data.data.product_type_id,
+                brand_id: data.data.brand_id,
+                id: id,
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+                msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.message || "Error");
+          }
+        })
+
+        self.$app.request({
+            method: 'GET',
+            url: `${self.$app.data.baseApiUrl}/product-types`,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+            },
+            contentType: 'application/json',
+            success: function (res) {
+                const data = JSON.parse(res)
+                self.$setState({
+                    product_type_list: data.data,
+                });
+            },
+            error: function (err) {
+                let msg = null
+                if (err.response) {
+                    msg = JSON.parse(err.response)
+                }
+                self.$app.dialog.alert(msg.message || "Error");
+            }
+        })
+
+        self.$app.request({
+            method: 'GET',
+            url: `${self.$app.data.baseApiUrl}/brands`,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+            },
+            contentType: 'application/json',
+            success: function (res) {
+                const data = JSON.parse(res)
+                self.$setState({
+                    brand_list: data.data,
+                });
+            },
+            error: function (err) {
+                let msg = null
+                if (err.response) {
+                    msg = JSON.parse(err.response)
+                }
+                self.$app.dialog.alert(msg.message || "Error");
+            }
+        })
+      }
+    }
+    }
+  </script>

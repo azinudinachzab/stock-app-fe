@@ -178,6 +178,19 @@ var routes = [
     path: '/new-product-type/',
     componentUrl: './pages/new-product-type.html',
   },
+
+  {
+    path: '/product/',
+    componentUrl: './pages/product.html',
+  },
+  {
+    path: '/edit-product/',
+    componentUrl: './pages/edit-product.html',
+  },
+  {
+    path: '/new-product/',
+    componentUrl: './pages/new-product.html',
+  },
   
   // Components
   {
