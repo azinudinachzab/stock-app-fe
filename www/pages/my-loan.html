@@ -1,0 +1,101 @@
+<template>
+  <div class="page">
+    <div class="navbar navbar-style-1">
+      <div class="navbar-bg"></div>
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a href="{{redirectURL}}" class="link">
+            <i class="icon flaticon-left"></i>
+          </a>
+        </div>
+        <div class="title">Tagihan Saya</div>
+      </div>
+    </div>
+    <div class="page-content content-area pt-80">
+      <div class="container">
+        <div class="card card-bx noti-area">
+          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{title}}</div>
+          <div class="item-title"><i class="text-success"></i>Cicilan bulan: {{list.datetime}}</div>
+          <div class="item-title"><i class="text-success"></i>Jumlah cicilan: {{list.amount}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+  
+  <script>
+    return {
+      // Component Data
+      data: function () {
+        // Must return an object
+        return {
+          id: 0,
+          token: "",
+          list: {},
+          redirectURL: "/home/",
+          title: ""
+        }
+      },
+      // Component Methods
+      methods: {},
+      on: {
+      pageInit: function () {
+        var self = this;
+        const id = self.$root.tesBaca("id-loan")
+        if(!id){
+          self.$app.dialog.alert("Pinjaman tidak dikenali")
+          return app.views.main.router.navigate('/product/');
+        }
+
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+          self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
+          return app.views.main.router.navigate('/signin/', {
+            reloadAll: true
+          });
+        }
+
+        let temp = "/home/"
+        if (tmp.user.role == 4) {
+          temp = "/product/"
+        }
+        self.$setState({
+          redirectURL: temp
+        })
+
+        self.$app.request({
+          method: 'GET',
+          url: `https://bq-loan-backend.herokuapp.com/loan-detail/general/${id}`,
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+            // console.log(data.data.General)
+            self.$setState({
+              id: id,
+              token: tmp.token,
+              list: data.data,
+              title: data.data.General.title
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.data.error || "Error");
+          }
+        })
+      }
+    }
+    }
+  </script>

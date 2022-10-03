@@ -8,10 +8,10 @@
             <i class="icon flaticon-left"></i>
           </a>
         </div>
-        <div class="title">Distributor</div>
-        <div class="right">
+        <div class="title">Manajemen Pengguna</div>
+        <!-- <div class="right">
           <a href="/new-distributor/" class="button button-fill color-green">+</a>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="page-content content-area pt-80">
@@ -19,10 +19,24 @@
         {{#each list}}
         <div class="card card-bx noti-area">
           <div class="item-title"><i class="text-success"></i>{{name}}</div>
+          <div class="item-title"><i class="text-success"></i>{{email}}</div>
           <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
           <div class="item-time">
-            <span class="text-dark" @click="delete({{id}})"><i class="fa fa-trash-o"></i> Delete</span>
+            {{#if "allowDelete"}}
+            <div class="left">
+              <span class="text-dark" @click="delete({{id}})"><h3><i class="fa fa-trash-o"></i> Delete</h3></span>
+              {{#js_if "this.is_active==1"}}
+              <span @click="toggleActive({{id}})" class="left button button-fill color-green text-green"></span>
+              {{/js_if}}
+
+              {{#js_if "this.is_active==0"}}
+              <span @click="toggleActive({{id}})" class="left button button-fill color-red text-green"></span>
+              {{/js_if}}
+            </div>
+            {{/if}}
+            {{#if "allowEdit"}}
             <span class="text-primary" @click="updatePage({{id}})">Edit</span>
+            {{/if}}
           </div>
         </div>
         {{/each}}
@@ -38,25 +52,27 @@
       // Must return an object
       return {
         list: [],
+        allowDelete: false,
+        allowEdit: false,
+        token: ""
       }
     },
     // Component Methods
     methods: {
-      delete: function (id) {
+      toggleActive: function (id) {
         var self = this;
         self.$app.dialog.confirm(
-          "Apakah anda yakin ingin menghapus distributor ini?",
+          "Apakah anda yakin ingin block/unblock user ini?",
           "Confirmation",
           function () {
             self.$app.request({
-              method: 'DELETE',
-              url: `https://dc-bogatama.herokuapp.com/distributors/${id}`,
+              method: 'PUT',
+              url: `https://bq-loan-backend.herokuapp.com/user/active/${id}`,
               headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+                'Authorization': `Bearer ${self.token}`,
               },
               success: function (res) {
-                self.$app.dialog.alert("Distributor berhasil dihapus")
+                self.$app.dialog.alert("User berhasil diubah statusnya")
                 return app.views.main.router.refreshPage();
               },
               error: function (err) {
@@ -64,7 +80,34 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.message || "Error");
+                self.$app.dialog.alert(msg.data.error || "Error");
+              }
+            })
+          }
+        );
+      },
+      delete: function (id) {
+        var self = this;
+        self.$app.dialog.confirm(
+          "Apakah anda yakin ingin menghapus user ini?",
+          "Confirmation",
+          function () {
+            self.$app.request({
+              method: 'DELETE',
+              url: `https://bq-loan-backend.herokuapp.com/user/${id}`,
+              headers: {
+                'Authorization': `Bearer ${self.token}`,
+              },
+              success: function (res) {
+                self.$app.dialog.alert("User berhasil dihapus")
+                return app.views.main.router.refreshPage();
+              },
+              error: function (err) {
+                let msg = null
+                if (err.response) {
+                  msg = JSON.parse(err.response)
+                }
+                self.$app.dialog.alert(msg.data.error || "Error");
               }
             })
           }
@@ -79,18 +122,47 @@
     on: {
       pageInit: function () {
         var self = this;
+
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+          self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
+          return app.views.main.router.navigate('/signin/', {
+            reloadAll: true
+          });
+        }
+
+        let aDelete = false
+        let aEdit = false
+        if (tmp.user.role == 4) {
+          aDelete = true
+          aEdit = true
+        } else if (tmp.user.role == 3) {
+          aEdit = true
+        }
+
         self.$app.request({
           method: 'GET',
-          url: 'https://dc-bogatama.herokuapp.com/distributors/',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-          },
+          url: 'https://bq-loan-backend.herokuapp.com/user',
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
+
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+
             self.$setState({
               list: data.data,
+              allowDelete: aDelete,
+              allowEdit: aEdit,
+              token: tmp.token
             });
           },
           error: function (err) {
@@ -98,7 +170,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.message || "Error");
+            self.$app.dialog.alert(msg.data.error || "Error");
           }
         })
       }

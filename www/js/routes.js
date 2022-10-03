@@ -84,11 +84,13 @@ var routes = [
   },
   {
     path: '/profile/',
-    url: './pages/profile.html',
+    // url: './pages/profile.html',
+    componentUrl: './pages/profile.html',
   },
   {
     path: '/user/',
-    url: './pages/user.html',
+    // url: './pages/user.html',
+    componentUrl: './pages/user.html',
   },
   
   // Form
@@ -188,8 +190,16 @@ var routes = [
     componentUrl: './pages/edit-product.html',
   },
   {
+    path: '/detail-product/',
+    componentUrl: './pages/detail-product.html',
+  },
+  {
     path: '/new-product/',
     componentUrl: './pages/new-product.html',
+  },
+  {
+    path: '/my-loan/',
+    componentUrl: './pages/my-loan.html',
   },
   
   // Components

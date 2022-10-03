@@ -8,7 +8,7 @@
             <i class="icon flaticon-left"></i>
           </a>
         </div>
-        <div class="title">Kategori Produk</div>
+        <div class="title">Jenis Pinjaman</div>
         <div class="right">
           <a href="/new-product-type/" class="button button-fill color-green">+</a>
         </div>
@@ -21,7 +21,9 @@
           <div class="item-title"><i class="text-success"></i>{{name}}</div>
           <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
           <div class="item-time">
+            {{#if "allowDelete"}}
             <span class="text-dark" @click="delete({{id}})"><i class="fa fa-trash-o"></i> Delete</span>
+            {{/if}}
             <span class="text-primary" @click="updatePage({{id}})">Edit</span>
           </div>
         </div>
@@ -38,6 +40,8 @@
       // Must return an object
       return {
         list: [],
+        token: "",
+        allowDelete: false
       }
     },
     // Component Methods
@@ -45,18 +49,17 @@
       delete: function (id) {
         var self = this;
         self.$app.dialog.confirm(
-          "Apakah anda yakin ingin menghapus Kategori Produk ini?",
+          "Apakah anda yakin ingin menghapus Jenis Pinjaman ini?",
           "Confirmation",
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `https://dc-bogatama.herokuapp.com/product-types/${id}`,
+              url: `https://bq-loan-backend.herokuapp.com/loan-type/${id}`,
               headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+                'Authorization': `Bearer ${self.token}`,
               },
               success: function (res) {
-                self.$app.dialog.alert("Kategori Produk berhasil dihapus")
+                self.$app.dialog.alert("Jenis Pinjaman berhasil dihapus")
                 return app.views.main.router.refreshPage();
               },
               error: function (err) {
@@ -64,7 +67,7 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.message || "Error");
+                self.$app.dialog.alert(msg.data.error || "Error");
               }
             })
           }
@@ -79,18 +82,42 @@
     on: {
       pageInit: function () {
         var self = this;
+
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+          self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
+          return app.views.main.router.navigate('/signin/', {
+            reloadAll: true
+          });
+        }
+
+        let temp = false
+				if(tmp.user.role == 4){
+					temp = true
+				}
+
         self.$app.request({
           method: 'GET',
-          url: 'https://dc-bogatama.herokuapp.com/product-types/',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-          },
+          url: 'https://bq-loan-backend.herokuapp.com/loan-type',
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
+            
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+            
             self.$setState({
               list: data.data,
+              token: tmp.token,
+              allowDelete: temp
             });
           },
           error: function (err) {
@@ -98,7 +125,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.message || "Error");
+            self.$app.dialog.alert(msg.data.error || "Error");
           }
         })
       }

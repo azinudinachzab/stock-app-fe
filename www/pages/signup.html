@@ -85,22 +85,28 @@
 
 				self.$app.request({
           method: 'POST',
-          url: 'https://dc-bogatama.herokuapp.com/users/register',
+          url: 'https://bq-loan-backend.herokuapp.com/user',
           data: {
 						email: self.email,
 						password: self.password,
 						name: self.name,
-						role: 3,
-    				isBlock: false,
+						role: 1,
+    				is_active: 0,
 					},
-					headers: {
-						'Access-Control-Allow-Origin': '*',
-						'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-					},
+					// headers: {
+					// 	'Access-Control-Allow-Origin': '*',
+					// 	'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+					// },
 					contentType: 'application/json',
           success: function(res) {
+						const data = JSON.parse(res)
+						
+						if(!data.status) {
+							self.$app.dialog.alert(data.data.error || "Error");
+							return
+						}
             // self.$app.router.navigate('home')
-						self.$app.dialog.alert("Registrasi berhasil");
+						self.$app.dialog.alert("Registrasi berhasil, namun akun anda belum aktif harap hubungi admin koperasi untuk aktivasi");
 						return app.views.main.router.navigate('/signin/');
           },
           error: function(err) {
@@ -108,7 +114,7 @@
 						if(err.response){
 							msg = JSON.parse(err.response)
 						}
-            self.$app.dialog.alert(msg.message || "Error");
+            self.$app.dialog.alert(msg.data.error || "Error");
           }
         })
       },

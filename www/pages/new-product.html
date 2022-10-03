@@ -7,42 +7,33 @@
             <div class="tab tab-active form-elements tabs">
               <form class="tab tab-active" id="tabA1">
                 <div class="title-bar mb-20">
-                  <h3 class="dz-title ma-0">Create Produk</h3>
-                  <a href="/product/" class="icon-close"><i class="flaticon-cancel"></i></a>
+                  <h3 class="dz-title ma-0">Ajukan Pinjaman</h3>
+                  <a href="{{redirectURL}}" class="icon-close"><i class="flaticon-cancel"></i></a>
                 </div>
                 <div class="list mb-0">
                   <ul class="row">
                     <li class="item-content item-input col-100">
-                        <div class="item-inner">
-                            <div class="item-title">Kategori Produk</div>
-                            <div class="item-input-wrap input-dropdown-wrap">
-                                <select @change="selectProductType" placeholder="Pilih Kategori Produk" required>
-                                    <option value="">-- Pilih --</option>
-                                    {{#each product_type_list}}
-                                    <option value="{{id}}">{{name}}</option>
-                                    {{/each}}
-                                </select>
-                            </div>
+                      <div class="item-inner">
+                        <div class="item-title">Jenis Pinjaman</div>
+                        <div class="item-input-wrap input-dropdown-wrap">
+                          <select @change="selectProductType" placeholder="Pilih Jenis Pinjaman" required>
+                            <option value="">-- Pilih --</option>
+                            {{#each product_type_list}}
+                            <option value="{{id}}">{{name}}</option>
+                            {{/each}}
+                          </select>
                         </div>
-                    </li>
-                    <li class="item-content item-input col-100">
-                        <div class="item-inner">
-                            <div class="item-title">Brand</div>
-                            <div class="item-input-wrap input-dropdown-wrap">
-                                <select @change="selectBrand" placeholder="Pilih Brand" required>
-                                    <option value="">-- Pilih --</option>
-                                    {{#each brand_list}}
-                                    <option value="{{id}}">{{name}}</option>
-                                    {{/each}}
-                                </select>
-                            </div>
-                        </div>
+                      </div>
                     </li>
                     <li class="item-content item-input col-100 item-input-with-value">
                       <div class="item-inner">
                         <div class="item-input-wrap">
-                          <input id="name" type="text" placeholder="Nama Produk" id="demo-username-22"
-                            class="form-control" @input="inputName" value="{{name}}" required/>
+                          <input id="name" type="text" placeholder="Nama Pinjaman" id="demo-username-22"
+                            class="form-control" @input="inputName" value="{{name}}" required /> </br>
+                          <input id="amount" type="text" placeholder="Jumlah pinjaman" id="demo-username-22"
+                            class="form-control" @input="inputAmount" value="{{amount}}" required /> </br>
+                          <input id="tenor" type="number" placeholder="Tenor Pinjaman" id="demo-username-22"
+                            class="form-control" @input="inputTenor" value="{{tenor}}" required /> </br>
                         </div>
                       </div>
                     </li>
@@ -69,10 +60,12 @@
       // Must return an object
       return {
         product_type_list: {},
-        brand_list: {},
         name: null,
         product_type_id: null,
-        brand_id: null,
+        redirectURL: "/home/",
+        user_id: 0,
+        amount: null,
+        tenor: null,
       }
     },
     // Component Methods
@@ -81,100 +74,116 @@
         var self = this;
 
         self.$app.request({
-            method: 'POST',
-            url: `${self.$app.data.baseApiUrl}/products/add`,
-            data: {
-                name: self.name,
-                product_type_id: self.product_type_id,
-                brand_id: self.brand_id,
-            },
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-            },
-            contentType: 'application/json',
-            success: function (res) {
-                self.$app.dialog.alert("Produk berhasil dibuat")
-                return app.views.main.router.navigate('/product/');
-            },
-            error: function (err) {
-                let msg = null
-                if (err.response) {
-                msg = JSON.parse(err.response)
-                }
-                self.$app.dialog.alert(msg.message || "Error");
+          method: 'POST',
+          url: 'https://bq-loan-backend.herokuapp.com/loan-general',
+          data: {
+            title: self.name,
+            user_id: self.user_id,
+            loan_type_id: parseInt(self.product_type_id),
+            amount: parseFloat(self.amount),
+            datetime: new Date(),
+            status: 0,
+            tenor: parseInt(self.tenor)
+          },
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
             }
+
+            self.$app.dialog.alert("Pinjaman berhasil diajukan")
+            return app.views.main.router.navigate(self.redirectURL);
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.data.error || "Error");
+          }
         })
       },
-        inputName: function (e) {
-            let self = this;
-            self.$setState({
-                name: e.target.value,
-            });
-        },
-        selectProductType: function (e) {
-            let self = this;
-            self.$setState({
-                product_type_id: e.target.value,
-            })
-        },
-        selectBrand: function (e) {
-            let self = this;
-            self.$setState({
-                brand_id: e.target.value,
-            })
-        }
+      inputName: function (e) {
+        let self = this;
+        self.$setState({
+          name: e.target.value,
+        });
+      },
+      inputAmount: function (e) {
+        let self = this;
+        self.$setState({
+          amount: e.target.value,
+        });
+      },
+      inputTenor: function (e) {
+        let self = this;
+        self.$setState({
+          tenor: e.target.value,
+        });
+      },
+      selectProductType: function (e) {
+        let self = this;
+        self.$setState({
+          product_type_id: e.target.value,
+        })
+      }
     },
     on: {
-            pageInit: function () {
-                let self = this;
-                self.$app.request({
-                    method: 'GET',
-                    url: `${self.$app.data.baseApiUrl}/product-types`,
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-                    },
-                    contentType: 'application/json',
-                    success: function (res) {
-                        const data = JSON.parse(res)
-                        self.$setState({
-                            product_type_list: data.data,
-                        });
-                    },
-                    error: function (err) {
-                        let msg = null
-                        if (err.response) {
-                            msg = JSON.parse(err.response)
-                        }
-                        self.$app.dialog.alert(msg.message || "Error");
-                    }
-                })
+      pageInit: function () {
+        let self = this;
 
-                self.$app.request({
-                    method: 'GET',
-                    url: `${self.$app.data.baseApiUrl}/brands`, 
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-                    },
-                    contentType: 'application/json',
-                    success: function (res) {
-                        const data = JSON.parse(res)
-                        self.$setState({
-                            brand_list: data.data,
-                        });
-                    },
-                    error: function (err) {
-                        let msg = null
-                        if (err.response) {
-                            msg = JSON.parse(err.response)
-                        }
-                        self.$app.dialog.alert(msg.message || "Error");
-                    }
-                })
-            },
-            
-      }
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+          self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
+          return app.views.main.router.navigate('/signin/', {
+            reloadAll: true
+          });
+        }
+
+        let temp = "/home/"
+        if (tmp.user.role == 4) {
+          temp = "/product/"
+        }
+
+        self.$app.request({
+          method: 'GET',
+          url: 'https://bq-loan-backend.herokuapp.com/loan-type',
+          // headers: {
+          //     'Access-Control-Allow-Origin': '*',
+          //     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+            self.$setState({
+              product_type_list: data.data,
+              redirectURL: temp,
+              user_id: tmp.user.id
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.data.error || "Error");
+          }
+        })
+      },
+
+    }
   }
 </script>

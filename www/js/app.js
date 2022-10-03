@@ -24,8 +24,8 @@ var app = new Framework7({
     return {
       baseApiUrl: 'http://localhost:3000',
       user: {
-        firstName: 'DC',
-        lastName: 'Bogatama',
+        firstName: 'Koperasi',
+        lastName: 'Baitul Qur`an',
       },
     };
   },
@@ -38,6 +38,9 @@ var app = new Framework7({
     },
     tesBaca: function(key) {
       return window.localStorage.getItem(key)
+    },
+    tesHapus: function(key) {
+      return window.localStorage.removeItem(key)
     }
   },
   routes: routes,

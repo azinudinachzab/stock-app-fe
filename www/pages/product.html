@@ -18,11 +18,26 @@
       <div class="container">
         {{#each list}}
         <div class="card card-bx noti-area">
-          <div class="item-title"><i class="text-success"></i>{{name}}</div>
+          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
+          <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
+          <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
+          <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
           <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
           <div class="item-time">
-            <span class="text-dark" @click="delete({{id}})"><i class="fa fa-trash-o"></i> Delete</span>
-            <span class="text-primary" @click="updatePage({{id}})">Edit</span>
+            <div class="left">
+              {{#if "allowDelete"}}
+              <span class="text-dark" @click="delete({{ID}})"><h3><i class="fa fa-trash-o"></i>Delete</h3></span>
+              {{/if}}
+              {{#js_if "this.status==1"}}
+              <span class="left button button-fill color-green text-green"></span>
+              {{/js_if}}
+
+              {{#js_if "this.status!=1"}}
+              <span class="left button button-fill color-red text-green"></span>
+              {{/js_if}}
+              </br>
+              <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+            </div>
           </div>
         </div>
         {{/each}}
@@ -38,6 +53,8 @@
       // Must return an object
       return {
         list: [],
+        token: "",
+        allowDelete: false,
       }
     },
     // Component Methods
@@ -45,18 +62,17 @@
       delete: function (id) {
         var self = this;
         self.$app.dialog.confirm(
-          "Apakah anda yakin ingin menghapus Produk ini?",
+          "Apakah anda yakin ingin menghapus cicilan ini?",
           "Confirmation",
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `${self.$app.data.baseApiUrl}/products/${id}`,
+              url: `https://bq-loan-backend.herokuapp.com/loan-general/${id}`,
               headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+                'Authorization': `Bearer ${self.token}`,
               },
               success: function (res) {
-                self.$app.dialog.alert("Produk berhasil dihapus")
+                self.$app.dialog.alert("Pinjaman berhasil dihapus")
                 return app.views.main.router.refreshPage();
               },
               error: function (err) {
@@ -64,33 +80,57 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.message || "Error");
+                self.$app.dialog.alert(msg.data.error || "Error");
               }
             })
           }
         );
       },
-      updatePage: function (id) {
+      detailLoan: function (id) {
         var self = this;
-        self.$root.tesSimpan("id-pt", id);
-        return app.views.main.router.navigate('/edit-product/');
+        self.$root.tesSimpan("id-loan", id);
+        return app.views.main.router.navigate('/detail-product/');
       }
     },
     on: {
       pageInit: function () {
         let self = this;
+
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+          self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
+          return app.views.main.router.navigate('/signin/', {
+            reloadAll: true
+          });
+        }
+
+        let temp = false
+				if(tmp.user.role == 4){
+					temp = true
+				}
+
         self.$app.request({
           method: 'GET',
-          url: `${self.$app.data.baseApiUrl}/products`,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-          },
+          url: `https://bq-loan-backend.herokuapp.com/loan-general`,
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
+
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+
             self.$setState({
               list: data.data,
+              token: tmp.token,
+              allowDelete: temp
             });
           },
           error: function (err) {
@@ -98,7 +138,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.message || "Error");
+            self.$app.dialog.alert(msg.data.error || "Error");
           }
         })
       }
