@@ -8,9 +8,9 @@
             <i class="icon flaticon-left"></i>
           </a>
         </div>
-        <div class="title">Jenis Pinjaman</div>
+        <div class="title">Produk</div>
         <div class="right">
-          <a href="/new-product-type/" class="button button-fill color-green">+</a>
+          <a href="/new-product/" class="button button-fill color-green">+</a>
         </div>
       </div>
     </div>
@@ -18,13 +18,26 @@
       <div class="container">
         {{#each list}}
         <div class="card card-bx noti-area">
-          <div class="item-title"><i class="text-success"></i>{{name}}</div>
+          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
+          <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
+          <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
+          <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
           <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
           <div class="item-time">
-            {{#if "allowDelete"}}
-            <span class="text-dark" @click="delete({{id}})"><i class="fa fa-trash-o"></i> Delete</span>
-            {{/if}}
-            <span class="text-primary" @click="updatePage({{id}})">Edit</span>
+            <div class="left">
+              {{#if "allowDelete"}}
+              <span class="text-dark" @click="delete({{ID}})"><h3><i class="fa fa-trash-o"></i>Delete</h3></span>
+              {{/if}}
+              {{#js_if "this.status==1"}}
+              <span class="left button button-fill color-green text-green"></span>
+              {{/js_if}}
+
+              {{#js_if "this.status!=1"}}
+              <span class="left button button-fill color-red text-green"></span>
+              {{/js_if}}
+              </br>
+              <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+            </div>
           </div>
         </div>
         {{/each}}
@@ -41,7 +54,7 @@
       return {
         list: [],
         token: "",
-        allowDelete: false
+        allowDelete: false,
       }
     },
     // Component Methods
@@ -49,17 +62,17 @@
       delete: function (id) {
         var self = this;
         self.$app.dialog.confirm(
-          "Apakah anda yakin ingin menghapus Jenis Pinjaman ini?",
+          "Apakah anda yakin ingin menghapus cicilan ini?",
           "Confirmation",
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `https://bq-loan-backend.herokuapp.com/loan-type/${id}`,
+              url: `https://bq-loan-backend.herokuapp.com/loan-general/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
               success: function (res) {
-                self.$app.dialog.alert("Jenis Pinjaman berhasil dihapus")
+                self.$app.dialog.alert("Pinjaman berhasil dihapus")
                 return app.views.main.router.refreshPage();
               },
               error: function (err) {
@@ -73,15 +86,15 @@
           }
         );
       },
-      updatePage: function (id) {
+      detailLoan: function (id) {
         var self = this;
-        self.$root.tesSimpan("id-pt", id)
-        return app.views.main.router.navigate('/edit-product-type/');
+        self.$root.tesSimpan("id-loan", id);
+        return app.views.main.router.navigate('/detail-product/');
       }
     },
     on: {
       pageInit: function () {
-        var self = this;
+        let self = this;
 
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
@@ -100,7 +113,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: 'https://bq-loan-backend.herokuapp.com/loan-type',
+          url: `https://bq-loan-backend.herokuapp.com/loan-general`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -108,12 +121,12 @@
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
-            
+
             if (!data.status) {
               self.$app.dialog.alert(data.data.error || "Error");
               return
             }
-            
+
             self.$setState({
               list: data.data,
               token: tmp.token,

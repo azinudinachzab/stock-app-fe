@@ -43,6 +43,7 @@
 							</div>
 						</form>
 						<form class="tab" id="tabA2">
+							<h1>Fitur ini masih dalam pengembangan harap hubungi IT Support WA (081809936104) untuk reset password</h1>
 							<div class="title-bar mb-20">
 								<h3 class="dz-title ma-0">Forget Password</h3>
 								<a href="#tabA1" data-route-tab-id="tabA1" class="tab-link icon-close"><i
@@ -90,18 +91,29 @@
 
 				self.$app.request({
           method: 'POST',
-          url: 'https://dc-bogatama.herokuapp.com/users/login',
+          url: 'https://bq-loan-backend.herokuapp.com/login',
           data: {
 						email: self.email,
 						password: self.password
 					},
-					headers: {
-						'Access-Control-Allow-Origin': '*',
-						'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-					},
+					// headers: {
+					// 	'Access-Control-Allow-Origin': '*',
+					// 	'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+					// },
 					contentType: 'application/json',
           success: function(res) {
 						const data = JSON.parse(res)
+						
+						if(!data.status) {
+							self.$app.dialog.alert(data.data.error || "Error");
+							return
+						}
+
+						if(data.data.user.is_active != 1) {
+							self.$app.dialog.alert("Mohon aktivasi akun terlebih dahulu" || "Error");
+							return
+						}
+
 						self.$root.tesSimpan("user", JSON.stringify(data.data))
 						return app.views.main.router.navigate('/home/');
           },
@@ -110,7 +122,7 @@
 						if(err.response){
 							msg = JSON.parse(err.response)
 						}
-            self.$app.dialog.alert(msg.message || "Error");
+            self.$app.dialog.alert(msg.data.error || "Error");
           }
         })
       },
