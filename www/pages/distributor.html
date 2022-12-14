@@ -67,7 +67,7 @@
           function () {
             self.$app.request({
               method: 'PUT',
-              url: `https://bq-loan-backend.herokuapp.com/user/active/${id}`,
+              url: `http://202.157.186.43:8989/user/active/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -94,7 +94,7 @@
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `https://bq-loan-backend.herokuapp.com/user/${id}`,
+              url: `http://202.157.186.43:8989/user/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -144,7 +144,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: 'https://bq-loan-backend.herokuapp.com/user',
+          url: 'http://202.157.186.43:8989/user',
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

@@ -85,7 +85,7 @@
 
 				self.$app.request({
           method: 'POST',
-          url: 'https://bq-loan-backend.herokuapp.com/user',
+          url: 'http://202.157.186.43:8989/user',
           data: {
 						email: self.email,
 						password: self.password,
@@ -100,7 +100,7 @@
 					contentType: 'application/json',
           success: function(res) {
 						const data = JSON.parse(res)
-						
+
 						if(!data.status) {
 							self.$app.dialog.alert(data.data.error || "Error");
 							return

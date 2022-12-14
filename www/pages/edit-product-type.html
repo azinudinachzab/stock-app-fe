@@ -35,7 +35,7 @@
     </div>
   </div>
   </template>
-  
+
   <script>
     return {
       // Component Data
@@ -51,10 +51,10 @@
       methods: {
         update: function () {
           var self = this;
-  
+
           self.$app.request({
             method: 'PUT',
-            url: `https://bq-loan-backend.herokuapp.com/loan-type/${self.id}`,
+            url: `http://202.157.186.43:8989/loan-type/${self.id}`,
             data: {
               name: self.name
             },
@@ -108,7 +108,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://bq-loan-backend.herokuapp.com/loan-type/${id}`,
+          url: `http://202.157.186.43:8989/loan-type/${id}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

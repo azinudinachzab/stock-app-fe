@@ -27,7 +27,7 @@
           {{#js_if "this.status==1"}}
             <span class="left button button-fill color-green text-green"></span>
           {{/js_if}}
-                
+
           {{#js_if "this.status!=1"}}
             <span @click="acceptLoan({{id}})" class="left button button-fill color-red text-green"></span>
           {{/js_if}}
@@ -37,7 +37,7 @@
     </div>
   </div>
 </template>
-  
+
   <script>
     return {
       // Component Data
@@ -66,7 +66,7 @@
             function () {
               self.$app.request({
                 method: 'GET',
-                url: `https://bq-loan-backend.herokuapp.com/loan-detail/accept/${id}`,
+                url: `http://202.157.186.43:8989/loan-detail/accept/${id}`,
                 headers: {
                   'Authorization': `Bearer ${self.token}`,
                 },
@@ -115,7 +115,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://bq-loan-backend.herokuapp.com/loan-detail/general/${id}`,
+          url: `http://202.157.186.43:8989/loan-detail/general/${id}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
