@@ -147,6 +147,8 @@
 					<h3 class="dz-title my-5">Rincian Arus Kas</h3>
 					<a href="/deals/"><i class="flaticon-right"></i></a>
 				</div>
+				{{/if}}
+				{{#if dashboard}}
 				<div class="row">
 					<div class="col-50 medium-20">
 						<div class="item-box">
@@ -223,6 +225,7 @@
 							</div>
 						</div>
 					</div>
+
 					<div class="row">
 						<a href="/distributor/" class="button button-fill button-large col-100 mb-15">Manajemen Pengguna</a>
 						<a href="/product-type/" class="button button-fill button-large col-100 mb-15">Jenis Pinjaman</a>
@@ -230,8 +233,8 @@
 						<a href="/product/" class="button button-fill button-large col-100 mb-15">Simpanan</a>
 						<a href="#" class="button button-fill button-large col-100 mb-15">Arus kas</a>
 					</div>
-					{{/if}}
 				</div>
+				{{/if}}
 			</div>
 		</div>
 		<div class="toolbar tabbar tabbar-labels toolbar-bottom menubar-area">
