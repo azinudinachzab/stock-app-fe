@@ -8,39 +8,46 @@
             <i class="icon flaticon-left"></i>
           </a>
         </div>
-        <div class="title">Produk</div>
+        <div class="title">Transaksi</div>
         <div class="right">
           <a href="/new-product/" class="button button-fill color-green">+</a>
         </div>
       </div>
     </div>
     <div class="page-content content-area pt-80">
-      <div class="container">
-        {{#each list}}
-        <div class="card card-bx noti-area">
-          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
-          <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
-          <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
-          <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
-          <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
-          <div class="item-time">
-            <div class="left">
-              {{#if "allowDelete"}}
-              <span class="text-dark" @click="delete({{ID}})"><h3><i class="fa fa-trash-o"></i>Delete</h3></span>
-              {{/if}}
-              {{#js_if "this.status==1"}}
-              <span class="left button button-fill color-green text-green"></span>
-              {{/js_if}}
+      <div data-infinite-distance="50" class="page-content infinite-scroll-content" @infinite="loadMore">
+        <!-- <div class="block-title">Scroll bottom</div> -->
+        <div class="container">
+          {{#each list}}
+          <div class="card card-bx noti-area">
+            <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
+            <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
+            <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
+            <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
+            <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
+            <div class="item-time">
+              <div class="left">
+                {{#if "allowDelete"}}
+                <span class="text-dark" @click="delete({{ID}})"><h3><i class="fa fa-trash-o"></i>Delete</h3></span>
+                {{/if}}
 
-              {{#js_if "this.status!=1"}}
-              <span class="left button button-fill color-red text-green"></span>
-              {{/js_if}}
-              </br>
-              <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+                {{#js_if "this.Status==1"}}
+                <span class="left button button-fill color-green text-green"></span>
+                </br>
+                <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+                {{/js_if}}
+
+                {{#js_if "this.Status!=1"}}
+                <span @click="acceptLoan({{ID}})" class="left button button-fill color-red text-green"></span>
+                {{/js_if}}
+              </div>
             </div>
           </div>
+          {{/each}}
         </div>
-        {{/each}}
+        {{#if hasMoreItems}}
+        <div class="preloader infinite-scroll-preloader"></div>
+        {{/if}}
       </div>
     </div>
   </div>
@@ -55,6 +62,9 @@
         list: [],
         token: "",
         allowDelete: false,
+        allowInfinite: true,
+        hasMoreItems: true,
+        lastItem: 25,
       }
     },
     // Component Methods
@@ -90,6 +100,97 @@
         var self = this;
         self.$root.tesSimpan("id-loan", id);
         return app.views.main.router.navigate('/detail-product/');
+      },
+      loadMore: function () {
+        var self = this;
+
+        var $ = self.$$;
+        if (!self.allowInfinite) return;
+        self.allowInfinite = false;
+
+        let lastIndexDatetime = self.list[self.list.length - 1].Datetime
+        self.$app.request({
+          method: 'GET',
+          url: `https://be.siskeubq.my.id/loan-general?timestamp=${lastIndexDatetime}`,
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+
+            setTimeout(function () {
+              if (self.lastItem >= 250) {
+                self.$setState({
+                  hasMoreItems: false,
+                });
+                self.$app.dialog.alert("Data yg di load sudah terlalu banyak, silahkan gunakan fitur pencarian untuk mencari data");
+                return;
+              }
+
+              if(data.data.length < 1){
+                self.$setState({
+                  hasMoreItems: false,
+                });
+                self.$app.dialog.alert("Belum ada data baru");
+                return
+              }
+
+              // let flag = false
+              // if(data.data.length == 25){
+              //   flag = true
+              // }
+
+              for (const val of data.data) {
+                self.list.push(val);
+              }
+              self.allowInfinite = true;
+              self.$setState({
+                list: self.list,
+                hasMoreItems: true,
+                lastItem: self.lastItem + data.data.length,
+              });
+            }, 1000);
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$setState({
+              hasMoreItems: false
+            });
+          }
+        })
+      },
+      acceptLoan: function(id) {
+        var self = this;
+        self.$app.dialog.confirm(
+          "Apakah anda yakin ingin menyetujui pinjaman ini?",
+          "Confirmation",
+          function () {
+            self.$app.request({
+              method: 'GET',
+              url: `https://be.siskeubq.my.id/loan-general/accept/${id}`,
+              headers: {
+                'Authorization': `Bearer ${self.token}`,
+              },
+              success: function (res) {
+                self.$app.dialog.alert("Pinjaman berhasil disetujui")
+                return app.views.main.router.refreshPage();
+              },
+              error: function (err) {
+                let msg = null
+                if (err.response) {
+                  msg = JSON.parse(err.response)
+                }
+                self.$app.dialog.alert(msg.data.error || "Error");
+              }
+            })
+          }
+        );
       }
     },
     on: {
@@ -127,10 +228,17 @@
               return
             }
 
+            let flag = false
+            if(data.data.length == 25){
+              flag = true
+            }
+
             self.$setState({
               list: data.data,
               token: tmp.token,
-              allowDelete: temp
+              allowDelete: temp,
+              allowInfinite: true,
+              hasMoreItems: flag
             });
           },
           error: function (err) {
@@ -139,6 +247,10 @@
               msg = JSON.parse(err.response)
             }
             self.$app.dialog.alert(msg.data.error || "Error");
+            self.$setState({
+              allowInfinite: false,
+              hasMoreItems: false
+            });
           }
         })
       }

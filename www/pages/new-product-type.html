@@ -7,7 +7,7 @@
             <div class="tab tab-active form-elements tabs">
               <form class="tab tab-active" id="tabA1">
                 <div class="title-bar mb-20">
-                  <h3 class="dz-title ma-0">Buat Jenis Pinjaman</h3>
+                  <h3 class="dz-title ma-0">Buat Jenis Transaksi</h3>
                   <a href="/product-type/" class="icon-close"><i class="flaticon-cancel"></i></a>
                 </div>
                 <div class="list mb-0">
@@ -15,8 +15,19 @@
                     <li class="item-content item-input col-100 item-input-with-value">
                       <div class="item-inner">
                         <div class="item-input-wrap">
-                          <input id="name" type="text" placeholder="Nama Jenis Pinjaman" id="demo-username-22"
+                          <input id="name" type="text" placeholder="Nama Jenis Transaksi" id="demo-username-22"
                             class="form-control" @input="inputName" value="{{name}}" />
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+
+                  <ul class="row">
+                    <li class="item-content item-input col-100 item-input-with-value">
+                      <div class="item-inner">
+                        <div class="item-input-wrap">
+                          <input id="margin" type="number" placeholder="Margin Transaksi" id="demo-username-23"
+                            class="form-control" @input="inputMargin" value="{{margin}}" />
                         </div>
                       </div>
                     </li>
@@ -42,7 +53,8 @@
     data: function () {
       // Must return an object
       return {
-        name: null
+        name: null,
+        margin: 0,
       }
     },
     // Component Methods
@@ -54,7 +66,8 @@
           method: 'POST',
           url: 'https://be.siskeubq.my.id/loan-type',
           data: {
-            name: self.name
+            name: self.name,
+            margin: parseFloat(self.margin),
           },
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
@@ -83,6 +96,12 @@
         var self = this;
         self.$setState({
           name: e.target.value,
+        });
+      },
+      inputMargin: function (e) {
+        var self = this;
+        self.$setState({
+          margin: e.target.value,
         });
       },
     },

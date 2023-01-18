@@ -51,6 +51,17 @@
 											</div>
 										</div>
 									</li>
+									<li class="item-content col-100 item-input">
+										<div class="item-inner">
+											<div class="item-input-wrap input-dropdown-wrap">
+												<label for="demo-il-14">Apakah anda kepala keluarga?</label>
+												<select id="demo-il-14" @change="selectKK" required>
+													<option value="true">YA</option>
+													<option value="false">TIDAK</option>
+												</select>
+											</div>
+										</div>
+									</li>
 								</ul>
 							</div>
 							<div class="list text-center">
@@ -76,6 +87,7 @@
         email: null,
 				password: null,
 				name: null,
+				is_leader: "true",
       }
     },
     // Component Methods
@@ -92,6 +104,7 @@
 						name: self.name,
 						role: 1,
     				is_active: 0,
+						is_leader: self.is_leader == "true" ? 1 : 0,
 					},
 					// headers: {
 					// 	'Access-Control-Allow-Origin': '*',
@@ -136,6 +149,12 @@
           name: e.target.value,
         });
       },
+			selectKK: function (e) {
+        let self = this;
+        self.$setState({
+          is_leader: e.target.value,
+        })
+      }
     },
 	}
 </script>

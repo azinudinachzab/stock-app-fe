@@ -46,6 +46,14 @@
 							<label class="title">Status Keanggotaan</label>
 							<span class="value">{{active_txt}}</span>
 						</li>
+						<li>
+							<label class="title">Status Kepala Keluarga</label>
+							<span class="value">{{leader_txt}}</span>
+						</li>
+						<li>
+							<label class="title">Saldo Koperasi</label>
+							<span class="value">Rp.{{user.balance}},00</span>
+						</li>
 						<!-- <li>
 							<label class="title">Shipping Address</label>
 							<span class="value">Marmora Road City</span>
@@ -91,10 +99,12 @@
 					email: "",
 					role: 0,
 					is_active: 0,
+					balance: 0,
 				},
 				token: "",
 				role_txt: "",
 				active_txt: "",
+				leader_txt: "",
 			}
 		},
 		methods: {},
@@ -122,11 +132,18 @@
 					1: "Aktif"
 				}
 
+				const mapIsLeader = {
+					0: "Bukan Kepala Keluarga",
+					1: "Kepala Keluarga",
+				}
+
 				self.$setState({
 					token: tmp.token,
 					user: tmp.user,
 					role_txt: mapRoleTxt[tmp.user.role],
-					active_txt: mapActiveTxt[tmp.user.is_active]
+					active_txt: mapActiveTxt[tmp.user.is_active],
+					balance: tmp.user.balance,
+					leader_txt: mapIsLeader[tmp.user.is_leader],
 				});
 			},
 			pageBeforeOut: function () {

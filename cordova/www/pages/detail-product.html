@@ -14,10 +14,25 @@
     <div class="page-content content-area pt-80">
       <div class="container">
         <div class="card card-bx noti-area">
-          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{title}}</div>
-          <div class="item-title"><i class="text-success"></i>Cicilan bulan: {{list.datetime}}</div>
-          <div class="item-title"><i class="text-success"></i>Jumlah cicilan: {{list.amount}}</div>
+          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{general.title}}</div>
+          <div class="item-title"><i class="text-success"></i>Total cicilan: {{general.amount}}</div>
+          <div class="item-title"><i class="text-success"></i>Tenor cicilan: {{general.tenor}}</div>
+          <div class="item-title"><i class="text-success"></i>Tanggal disetujui: {{general.datetime}}</div>
         </div>
+        <hr>
+        {{#each list}}
+        <div class="card card-bx noti-area">
+          <div class="item-title"><i class="text-success"></i>Jatuh tenggat: {{datetime}}</div>
+          <div class="item-title"><i class="text-success"></i>Jumlah tagihan: {{amount}}</div>
+          {{#js_if "this.status==1"}}
+            <span class="left button button-fill color-green text-green"></span>
+          {{/js_if}}
+
+          {{#js_if "this.status!=1"}}
+            <span @click="acceptLoan({{id}})" class="left button button-fill color-red text-green"></span>
+          {{/js_if}}
+        </div>
+        {{/each}}
       </div>
     </div>
   </div>
@@ -31,13 +46,46 @@
         return {
           id: 0,
           token: "",
-          list: {},
+          list: [],
           redirectURL: "/home/",
-          title: ""
+          general: {
+            title: "",
+            amount: "",
+            tenor: 0,
+            datetime: "",
+          },
         }
       },
       // Component Methods
-      methods: {},
+      methods: {
+        acceptLoan: function(id) {
+          var self = this;
+          self.$app.dialog.confirm(
+            "Apakah anda yakin ingin menandai bahwa tagihan ini sudah dibayar?",
+            "Confirmation",
+            function () {
+              self.$app.request({
+                method: 'GET',
+                url: `https://be.siskeubq.my.id/loan-detail/accept/${id}`,
+                headers: {
+                  'Authorization': `Bearer ${self.token}`,
+                },
+                success: function (res) {
+                  self.$app.dialog.alert("Tagihan berhasil ditandai sudah dibayar")
+                  return app.views.main.router.refreshPage();
+                },
+                error: function (err) {
+                  let msg = null
+                  if (err.response) {
+                    msg = JSON.parse(err.response)
+                  }
+                  self.$app.dialog.alert(msg.data.error || "Error");
+                }
+              })
+            }
+          );
+        },
+      },
       on: {
       pageInit: function () {
         var self = this;
@@ -57,7 +105,7 @@
           });
         }
 
-        let temp = "/home/"
+        let temp = "/my-loan/"
         if (tmp.user.role == 4) {
           temp = "/product/"
         }
@@ -83,8 +131,13 @@
             self.$setState({
               id: id,
               token: tmp.token,
-              list: data.data,
-              title: data.data.General.title
+              list: data.data.Details,
+              general: {
+                title: data.data.General.title,
+                amount: data.data.General.amount,
+                tenor: data.data.General.tenor,
+                datetime: data.data.General.datetime
+              }
             });
           },
           error: function (err) {

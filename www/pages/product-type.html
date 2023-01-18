@@ -8,7 +8,7 @@
             <i class="icon flaticon-left"></i>
           </a>
         </div>
-        <div class="title">Jenis Pinjaman</div>
+        <div class="title">Jenis Transaksi</div>
         <div class="right">
           <a href="/new-product-type/" class="button button-fill color-green">+</a>
         </div>
@@ -19,6 +19,7 @@
         {{#each list}}
         <div class="card card-bx noti-area">
           <div class="item-title"><i class="text-success"></i>{{name}}</div>
+          <div class="item-title"><i class="text-success"></i>Margin: {{margin}}</div>
           <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
           <div class="item-time">
             {{#if "allowDelete"}}

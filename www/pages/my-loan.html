@@ -12,40 +12,131 @@
       </div>
     </div>
     <div class="page-content content-area pt-80">
-      <div class="container">
-        <div class="card card-bx noti-area">
-          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{title}}</div>
-          <div class="item-title"><i class="text-success"></i>Cicilan bulan: {{list.datetime}}</div>
-          <div class="item-title"><i class="text-success"></i>Jumlah cicilan: {{list.amount}}</div>
+      <div data-infinite-distance="50" class="page-content infinite-scroll-content" @infinite="loadMore">
+        <!-- <div class="block-title">Scroll bottom</div> -->
+        <div class="container">
+          {{#each list}}
+          <div class="card card-bx noti-area">
+            <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
+            <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
+            <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
+            <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
+            <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
+            <div class="item-time">
+              <div class="left">
+                {{#js_if "this.Status==1"}}
+                <span class="left button button-fill color-green text-green">SUDAH DISETUJUI</span>
+                </br>
+                <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+                {{/js_if}}
+
+                {{#js_if "this.Status!=1"}}
+                <span class="left button button-fill color-red text-green">BELUM DISETUJUI</span>
+                {{/js_if}}
+              </div>
+            </div>
+          </div>
+          {{/each}}
         </div>
+        {{#if hasMoreItems}}
+        <div class="preloader infinite-scroll-preloader"></div>
+        {{/if}}
       </div>
     </div>
   </div>
 </template>
 
-  <script>
-    return {
-      // Component Data
-      data: function () {
-        // Must return an object
-        return {
-          id: 0,
-          token: "",
-          list: {},
-          redirectURL: "/home/",
-          title: ""
-        }
-      },
-      // Component Methods
-      methods: {},
-      on: {
-      pageInit: function () {
+<script>
+  return {
+    // Component Data
+    data: function () {
+      // Must return an object
+      return {
+        list: [],
+        token: "",
+        allowInfinite: true,
+        hasMoreItems: true,
+        lastItem: 25,
+        redirectURL: "/home/",
+      }
+    },
+    // Component Methods
+    methods: {
+      detailLoan: function (id) {
         var self = this;
-        const id = self.$root.tesBaca("id-loan")
-        if(!id){
-          self.$app.dialog.alert("Pinjaman tidak dikenali")
-          return app.views.main.router.navigate('/product/');
-        }
+        self.$root.tesSimpan("id-loan", id);
+        return app.views.main.router.navigate('/detail-product/');
+      },
+      loadMore: function () {
+        var self = this;
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        var $ = self.$$;
+        if (!self.allowInfinite) return;
+        self.allowInfinite = false;
+
+        let lastIndexDatetime = self.list[self.list.length - 1].Datetime
+        self.$app.request({
+          method: 'GET',
+          url: `https://be.siskeubq.my.id/loan-general?creditor=${tmp.user.name}&timestamp=${lastIndexDatetime}`,
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+
+            setTimeout(function () {
+              if (self.lastItem >= 250) {
+                self.$setState({
+                  hasMoreItems: false,
+                });
+                self.$app.dialog.alert("Data yg di load sudah terlalu banyak, silahkan gunakan fitur pencarian untuk mencari data");
+                return;
+              }
+
+              if(data.data.length < 1){
+                self.$setState({
+                  hasMoreItems: false,
+                });
+                self.$app.dialog.alert("Belum ada data baru");
+                return
+              }
+
+              // let flag = false
+              // if(data.data.length == 25){
+              //   flag = true
+              // }
+
+              for (const val of data.data) {
+                self.list.push(val);
+              }
+              self.allowInfinite = true;
+              self.$setState({
+                list: self.list,
+                hasMoreItems: true,
+                lastItem: self.lastItem + data.data.length,
+              });
+            }, 1000);
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$setState({
+              hasMoreItems: false
+            });
+          }
+        })
+      },
+    },
+    on: {
+      pageInit: function () {
+        let self = this;
 
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
@@ -58,16 +149,16 @@
         }
 
         let temp = "/home/"
-        if (tmp.user.role == 4) {
-          temp = "/product/"
-        }
+				if (tmp.user.role == 4){
+					temp = "/product/"
+				}
         self.$setState({
           redirectURL: temp
         })
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-detail/general/${id}`,
+          url: `https://be.siskeubq.my.id/loan-general?creditor=${tmp.user.name}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -75,16 +166,22 @@
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
+
             if (!data.status) {
               self.$app.dialog.alert(data.data.error || "Error");
               return
             }
-            // console.log(data.data.General)
+
+            let flag = false
+            if(data.data.length == 25){
+              flag = true
+            }
+
             self.$setState({
-              id: id,
-              token: tmp.token,
               list: data.data,
-              title: data.data.General.title
+              token: tmp.token,
+              allowInfinite: true,
+              hasMoreItems: flag
             });
           },
           error: function (err) {
@@ -93,9 +190,13 @@
               msg = JSON.parse(err.response)
             }
             self.$app.dialog.alert(msg.data.error || "Error");
+            self.$setState({
+              allowInfinite: false,
+              hasMoreItems: false
+            });
           }
         })
       }
     }
-    }
-  </script>
+  }
+</script>
