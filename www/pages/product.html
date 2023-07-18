@@ -15,6 +15,16 @@
       </div>
     </div>
     <div class="page-content content-area pt-80">
+      <div class="container">
+        <div class="card card-bx noti-area">
+          <select>
+            <option>Nama peminjam</option>
+            <!-- <option>Nama pinjaman</option> -->
+          </select>
+          <input id="margin" type="text" placeholder="Search..." id="demo-username-23"
+            class="form-control" @input="inputMargin" />
+        </div>
+      </div>
       <div data-infinite-distance="50" class="page-content infinite-scroll-content" @infinite="loadMore">
         <!-- <div class="block-title">Scroll bottom</div> -->
         <div class="container">
@@ -69,6 +79,47 @@
     },
     // Component Methods
     methods: {
+      inputMargin: function (e) {
+        var self = this;
+        if (e.target.value.length < 3){
+          return
+        }
+        
+        self.$app.request({
+          method: 'GET',
+          url: `https://be.siskeubq.my.id/loan-general?creditor=${e.target.value}`,
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+
+            if (!data.status) {
+              self.$app.dialog.alert(data.data.error || "Error");
+              return
+            }
+
+            self.$setState({
+              list: data.data,
+              allowInfinite: false,
+              hasMoreItems: false
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$setState({
+              allowInfinite: false,
+              hasMoreItems: false
+            });
+          }
+        })
+      },
       delete: function (id) {
         var self = this;
         self.$app.dialog.confirm(
