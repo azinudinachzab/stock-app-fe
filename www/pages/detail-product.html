@@ -64,6 +64,12 @@
             "Apakah anda yakin ingin menandai bahwa tagihan ini sudah dibayar?",
             "Confirmation",
             function () {
+              let tmp = self.$root.tesBaca("user")
+              tmp = JSON.parse(tmp)
+              if(tmp.user.role != 4){
+                self.$app.dialog.alert("Hanya admin yg dapat merubah status cicilan!")
+                return app.views.main.router.refreshPage();
+              }
               self.$app.request({
                 method: 'GET',
                 url: `https://be.siskeubq.my.id/loan-detail/accept/${id}`,
