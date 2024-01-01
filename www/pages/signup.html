@@ -97,7 +97,7 @@
 
 				self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/user',
+          url: self.$root.getURL()+'/user',
           data: {
 						email: self.email,
 						password: self.password,
@@ -115,7 +115,7 @@
 						const data = JSON.parse(res)
 
 						if(!data.status) {
-							self.$app.dialog.alert(data.data.error || "Error");
+							self.$app.dialog.alert(data.message || "Error");
 							return
 						}
             // self.$app.router.navigate('home')
@@ -127,7 +127,7 @@
 						if(err.response){
 							msg = JSON.parse(err.response)
 						}
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
           }
         })
       },

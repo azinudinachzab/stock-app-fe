@@ -12,25 +12,35 @@
       </div>
     </div>
     <div class="page-content content-area pt-80">
+      <div class="container">
+        <div class="card card-bx noti-area">
+          <select>
+            <option>Nama tagihan</option>
+            <!-- <option>Nama pinjaman</option> -->
+          </select>
+          <input id="margin" type="text" placeholder="Search..." id="demo-username-23"
+                 class="form-control" @input="inputMargin" />
+        </div>
+      </div>
       <div data-infinite-distance="50" class="page-content infinite-scroll-content" @infinite="loadMore">
         <!-- <div class="block-title">Scroll bottom</div> -->
         <div class="container">
           {{#each list}}
           <div class="card card-bx noti-area">
-            <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
-            <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
-            <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
-            <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
+            <div class="item-title"><i class="text-success"></i>Nama tagihan: {{title}}</div>
+            <div class="item-title"><i class="text-success"></i>Jenis tagihan: {{loan_type.name}}</div>
+            <div class="item-title"><i class="text-success"></i>Jumlah total: {{amount}}</div>
+            <div class="item-title"><i class="text-success"></i>Tenor: {{tenor}}</div>
             <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
             <div class="item-time">
               <div class="left">
-                {{#js_if "this.Status==1"}}
+                {{#js_if "this.status==1"}}
                 <span class="left button button-fill color-green text-green">SUDAH DISETUJUI</span>
                 </br>
-                <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+                <span class="text-primary" @click="detailLoan({{id}})">Detail tagihan</span>
                 {{/js_if}}
 
-                {{#js_if "this.Status!=1"}}
+                {{#js_if "this.status!=1"}}
                 <span class="left button button-fill color-red text-green">BELUM DISETUJUI</span>
                 {{/js_if}}
               </div>
@@ -62,6 +72,49 @@
     },
     // Component Methods
     methods: {
+      inputMargin: function (e) {
+        var self = this;
+        if (e.target.value.length < 3){
+          return
+        }
+        let tmp = self.$root.tesBaca("user")
+        tmp = JSON.parse(tmp)
+
+        self.$app.request({
+          method: 'GET',
+          url: self.$root.getURL()+`/loan-general?uid=${tmp.user.id}&id=0&title=${e.target.value}`,
+          // headers: {
+          //   'Access-Control-Allow-Origin': '*',
+          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          // },
+          contentType: 'application/json',
+          success: function (res) {
+            const data = JSON.parse(res)
+
+            if (!data.status) {
+              self.$app.dialog.alert(data.message || "Error");
+              return
+            }
+
+            self.$setState({
+              list: data.data,
+              allowInfinite: false,
+              hasMoreItems: false
+            });
+          },
+          error: function (err) {
+            let msg = null
+            if (err.response) {
+              msg = JSON.parse(err.response)
+            }
+            self.$app.dialog.alert(msg.message || "Error");
+            self.$setState({
+              allowInfinite: false,
+              hasMoreItems: false
+            });
+          }
+        })
+      },
       detailLoan: function (id) {
         var self = this;
         self.$root.tesSimpan("id-loan", id);
@@ -76,15 +129,15 @@
         if (!self.allowInfinite) return;
         self.allowInfinite = false;
 
-        let lastIndexDatetime = self.list[self.list.length - 1].Datetime
+        let lastIndexID = self.list[self.list.length - 1].id
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general?creditor=${tmp.user.name}&timestamp=${lastIndexDatetime}`,
+          url: self.$root.getURL()+`/loan-general?uid=${tmp.user.id}&id=${lastIndexID}`,
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -126,7 +179,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
             self.$setState({
               hasMoreItems: false
             });
@@ -141,7 +194,7 @@
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
 
-        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+        if (tmp === null || tmp.user === undefined) {
           self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
           return app.views.main.router.navigate('/signin/', {
             reloadAll: true
@@ -158,7 +211,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general?creditor=${tmp.user.name}`,
+          url: self.$root.getURL()+`/loan-general?uid=${tmp.user.id}&id=0`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -168,7 +221,7 @@
             const data = JSON.parse(res)
 
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -189,7 +242,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
             self.$setState({
               allowInfinite: false,
               hasMoreItems: false

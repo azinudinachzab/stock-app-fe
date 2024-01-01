@@ -75,7 +75,7 @@
 
         self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/loan-general',
+          url: self.$root.getURL()+'/loan-general',
           data: {
             title: self.name,
             user_id: self.user_id,
@@ -156,7 +156,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: 'https://be.siskeubq.my.id/loan-type',
+          url: self.$root.getURL()+'/loan-type',
           // headers: {
           //     'Access-Control-Allow-Origin': '*',
           //     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

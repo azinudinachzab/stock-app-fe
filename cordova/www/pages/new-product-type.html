@@ -64,7 +64,7 @@
 
         self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/loan-type',
+          url: self.$root.getURL()+'/loan-type',
           data: {
             name: self.name,
             margin: parseFloat(self.margin),

@@ -67,7 +67,7 @@
           function () {
             self.$app.request({
               method: 'PUT',
-              url: `https://be.siskeubq.my.id/user/active/${id}`,
+              url: self.$root.getURL()+`/user/active/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -80,7 +80,7 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.data.error || "Error");
+                self.$app.dialog.alert(msg.message || "Error");
               }
             })
           }
@@ -94,7 +94,7 @@
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `https://be.siskeubq.my.id/user/${id}`,
+              url: self.$root.getURL()+`/user/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -107,7 +107,7 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.data.error || "Error");
+                self.$app.dialog.alert(msg.message || "Error");
               }
             })
           }
@@ -126,7 +126,7 @@
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
 
-        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+        if (tmp === null || tmp.user === undefined) {
           self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
           return app.views.main.router.navigate('/signin/', {
             reloadAll: true
@@ -144,7 +144,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: 'https://be.siskeubq.my.id/user',
+          url: self.$root.getURL()+'/user',
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -154,7 +154,7 @@
             const data = JSON.parse(res)
 
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -170,7 +170,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
           }
         })
       }

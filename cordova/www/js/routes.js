@@ -70,8 +70,8 @@ var routes = [
   },
   {
     path: '/home/',
-    // url: './pages/home.html',
-    componentUrl: './pages/home.html',
+    // url: './pages/admin-home.html',
+    componentUrl: './pages/admin-home.html',
   },
   {
     path: '/categories/',
@@ -199,7 +199,7 @@ var routes = [
   },
   {
     path: '/my-loan/',
-    componentUrl: './pages/my-loan.html',
+    componentUrl: './pages/my-admin-loan.html',
   },
   
   // Components

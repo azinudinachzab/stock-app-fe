@@ -14,10 +14,11 @@
     <div class="page-content content-area pt-80">
       <div class="container">
         <div class="card card-bx noti-area">
-          <div class="item-title"><i class="text-success"></i>Nama cicilan: {{general.title}}</div>
-          <div class="item-title"><i class="text-success"></i>Total cicilan: {{general.amount}}</div>
-          <div class="item-title"><i class="text-success"></i>Tenor cicilan: {{general.tenor}}</div>
+          <div class="item-title"><i class="text-success"></i>Nama tagihan: {{general.title}}</div>
+          <div class="item-title"><i class="text-success"></i>Total tagihan: {{general.amount}}</div>
+          <div class="item-title"><i class="text-success"></i>Tenor tagihan: {{general.tenor}}</div>
           <div class="item-title"><i class="text-success"></i>Tanggal disetujui: {{general.datetime}}</div>
+          <div class="item-title"><i class="text-success"></i>Jenis pinjaman: {{general.lt_name}}</div>
         </div>
         <hr>
         {{#each list}}
@@ -29,7 +30,7 @@
           {{/js_if}}
 
           {{#js_if "this.status!=1"}}
-            <span @click="acceptLoan({{id}})" class="left button button-fill color-red text-green"></span>
+            <span class="left button button-fill color-red text-green"></span>
           {{/js_if}}
         </div>
         {{/each}}
@@ -53,6 +54,7 @@
             amount: "",
             tenor: 0,
             datetime: "",
+            lt_name: "",
           },
         }
       },
@@ -67,12 +69,12 @@
               let tmp = self.$root.tesBaca("user")
               tmp = JSON.parse(tmp)
               if(tmp.user.role != 4){
-                self.$app.dialog.alert("Hanya admin yg dapat merubah status cicilan!")
+                self.$app.dialog.alert("Hanya admin yg dapat merubah status tagihan!")
                 return app.views.main.router.refreshPage();
               }
               self.$app.request({
                 method: 'GET',
-                url: `https://be.siskeubq.my.id/loan-detail/accept/${id}`,
+                url: self.$root.getURL()+`/loan-detail/accept/${id}`,
                 headers: {
                   'Authorization': `Bearer ${self.token}`,
                 },
@@ -85,7 +87,7 @@
                   if (err.response) {
                     msg = JSON.parse(err.response)
                   }
-                  self.$app.dialog.alert(msg.data.error || "Error");
+                  self.$app.dialog.alert(msg.message || "Error");
                 }
               })
             }
@@ -104,7 +106,7 @@
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
 
-        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+        if (tmp === null || tmp.user === undefined) {
           self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
           return app.views.main.router.navigate('/signin/', {
             reloadAll: true
@@ -121,37 +123,57 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-detail/general/${id}`,
-          // headers: {
-          //   'Access-Control-Allow-Origin': '*',
-          //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-          // },
+          url: self.$root.getURL()+`/loan-general/${id}`,
           contentType: 'application/json',
-          success: function (res) {
-            const data = JSON.parse(res)
-            if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+          success: function(resG) {
+            const dataG = JSON.parse(resG)
+            if (!dataG.status) {
+              self.$app.dialog.alert(dataG.message || "Error");
               return
             }
-            // console.log(data.data.General)
-            self.$setState({
-              id: id,
-              token: tmp.token,
-              list: data.data.Details,
-              general: {
-                title: data.data.General.title,
-                amount: data.data.General.amount,
-                tenor: data.data.General.tenor,
-                datetime: data.data.General.datetime
+            self.$app.request({
+              method: 'GET',
+              url: self.$root.getURL()+`/loan-detail?id=${id}`,
+              // headers: {
+              //   'Access-Control-Allow-Origin': '*',
+              //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+              // },
+              contentType: 'application/json',
+              success: function (res) {
+                const data = JSON.parse(res)
+                if (!data.status) {
+                  self.$app.dialog.alert(data.message || "Error");
+                  return
+                }
+                // console.log(data.data.General)
+                self.$setState({
+                  id: id,
+                  token: tmp.token,
+                  list: data.data,
+                  general: {
+                    title: dataG.data.title,
+                    amount: dataG.data.amount,
+                    tenor: dataG.data.tenor,
+                    datetime: dataG.data.datetime,
+                    lt_name: dataG.data.loan_type.name
+                  }
+                });
+              },
+              error: function (err) {
+                let msg = null
+                if (err.response) {
+                  msg = JSON.parse(err.response)
+                }
+                self.$app.dialog.alert(msg.message || "Error");
               }
-            });
+            })
           },
-          error: function (err) {
+          error: function (errG) {
             let msg = null
-            if (err.response) {
-              msg = JSON.parse(err.response)
+            if (errG.response) {
+              msg = JSON.parse(errG.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
           }
         })
       }

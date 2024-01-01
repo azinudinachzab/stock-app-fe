@@ -91,7 +91,7 @@
 
 				self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/login',
+          url: self.$root.getURL()+'/login',
           data: {
 						email: self.email,
 						password: self.password

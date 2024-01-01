@@ -97,7 +97,7 @@
 
 				self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/user',
+          url: self.$root.getURL()+'/user',
           data: {
 						email: self.email,
 						password: self.password,

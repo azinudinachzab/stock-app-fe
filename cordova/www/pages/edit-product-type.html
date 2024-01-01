@@ -66,7 +66,7 @@
 
           self.$app.request({
             method: 'PUT',
-            url: `https://be.siskeubq.my.id/loan-type/${self.id}`,
+            url: self.$root.getURL()+`/loan-type/${self.id}`,
             data: {
               name: self.name,
               margin: parseFloat(self.margin),
@@ -127,7 +127,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-type/${id}`,
+          url: self.$root.getURL()+`/loan-type/${id}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

@@ -41,6 +41,10 @@ var app = new Framework7({
     },
     tesHapus: function(key) {
       return window.localStorage.removeItem(key)
+    },
+    getURL: function() {
+        return "https://be.siskeubq.my.id/"
+        // return "http://localhost:8080/"
     }
   },
   routes: routes,

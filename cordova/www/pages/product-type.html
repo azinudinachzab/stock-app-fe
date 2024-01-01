@@ -55,7 +55,7 @@
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `https://be.siskeubq.my.id/loan-type/${id}`,
+              url: self.$root.getURL()+`/loan-type/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -101,7 +101,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: 'https://be.siskeubq.my.id/loan-type',
+          url: self.$root.getURL()+'/loan-type',
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

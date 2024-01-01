@@ -64,7 +64,7 @@
 
         self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/loan-type',
+          url: self.$root.getURL()+'/loan-type',
           data: {
             name: self.name,
             margin: parseFloat(self.margin),
@@ -77,7 +77,7 @@
           success: function (res) {
             const data = JSON.parse(res)
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
             self.$app.dialog.alert("Jenis pinjaman berhasil dibuat")
@@ -88,7 +88,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
           }
         })
       },

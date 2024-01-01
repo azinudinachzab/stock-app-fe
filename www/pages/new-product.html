@@ -19,7 +19,7 @@
                           <select @change="selectProductType" placeholder="Pilih Jenis Pinjaman" required>
                             <option value="">-- Pilih --</option>
                             {{#each product_type_list}}
-                            <option value="{{id}}">{{name}}</option>
+                            <option value="{{id}}|{{is_add_balance}}">{{name}}</option>
                             {{/each}}
                           </select>
                         </div>
@@ -28,21 +28,29 @@
                     <li class="item-content item-input col-100 item-input-with-value">
                       <div class="item-inner">
                         <div class="item-input-wrap">
+                          {{#js_if "this.disable.name===false"}}
                           <input id="name" type="text" placeholder="Nama Pinjaman" id="demo-username-22"
                             class="form-control" @input="inputName" value="{{name}}" required /> </br>
+                          {{/js_if}}
+                          {{#js_if "this.disable.amount===false"}}
                           <input id="amount" type="text" placeholder="Jumlah pinjaman" id="demo-username-22"
                             class="form-control" @input="inputAmount" value="{{amount}}" required /> </br>
+                          {{/js_if}}
+                          {{#js_if "this.disable.tenor===false"}}
                           <input id="tenor" type="number" placeholder="Tenor Pinjaman" id="demo-username-22"
                             class="form-control" @input="inputTenor" value="{{tenor}}" required /> </br>
+                          {{/js_if}}
                         </div>
                       </div>
                     </li>
                   </ul>
                 </div>
                 <div class="list">
+                  {{#js_if "this.disable.button===false"}}
                   <ul>
                     <li class="mb-15"><a @click="create" class="button-large button button-fill">Confirm</a></li>
                   </ul>
+                  {{/js_if}}
                 </div>
               </form>
             </div>
@@ -59,13 +67,19 @@
     data: function () {
       // Must return an object
       return {
-        product_type_list: {},
+        product_type_list: [],
         name: null,
         product_type_id: null,
         redirectURL: "/home/",
         user_id: 0,
         amount: null,
-        tenor: null,
+        tenor: 1,
+        disable: {
+          name: true,
+          amount: true,
+          tenor: true,
+          button: true
+        }
       }
     },
     // Component Methods
@@ -75,7 +89,7 @@
 
         self.$app.request({
           method: 'POST',
-          url: 'https://be.siskeubq.my.id/loan-general',
+          url: self.$root.getURL()+'/loan-general',
           data: {
             title: self.name,
             user_id: self.user_id,
@@ -94,7 +108,7 @@
             const data = JSON.parse(res)
 
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -106,7 +120,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
           }
         })
       },
@@ -130,8 +144,27 @@
       },
       selectProductType: function (e) {
         let self = this;
+        const val = e.target.value.split("|");
+        if(val[1]==1){
+          self.$setState({
+            product_type_id: val[0],
+            disable: {
+              name: false,
+              amount: false,
+              tenor: false,
+              button: false
+            }
+          })
+          return
+        }
         self.$setState({
-          product_type_id: e.target.value,
+          product_type_id: val[0],
+          disable: {
+            name: false,
+            amount: false,
+            tenor: true,
+            button: false
+          }
         })
       }
     },
@@ -142,7 +175,7 @@
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
 
-        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+        if (tmp === null || tmp.user === undefined) {
           self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
           return app.views.main.router.navigate('/signin/', {
             reloadAll: true
@@ -156,7 +189,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: 'https://be.siskeubq.my.id/loan-type',
+          url: self.$root.getURL()+'/loan-type',
           // headers: {
           //     'Access-Control-Allow-Origin': '*',
           //     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -165,7 +198,7 @@
           success: function (res) {
             const data = JSON.parse(res)
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
             self.$setState({
@@ -179,7 +212,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
           }
         })
       },

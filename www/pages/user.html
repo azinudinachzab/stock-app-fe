@@ -82,7 +82,7 @@
 				let tmp = self.$root.tesBaca("user")
 				tmp = JSON.parse(tmp)
 
-				if(tmp === null || tmp.token === undefined || tmp.user === undefined){
+				if(tmp === null || tmp.user === undefined){
 					self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
 					return app.views.main.router.navigate('/signin/', {reloadAll: true});
 				}

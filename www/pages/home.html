@@ -27,7 +27,7 @@
 								<div class="post-info">
 									<!-- <h3 style="background-color:grey;color:white;">DALAM PENGERJAAN</h3> -->
 									<h3 class="title">Pinjaman Terkini</h3>
-									<h3 class="subtitle">Rp.4.650.000,00</h3>
+									<h3 class="subtitle">{{latest_loan}}</h3>
 								</div>
 							</div>
 							</a>
@@ -41,7 +41,7 @@
 								<div class="post-info">
 									<!-- <h3 style="background-color:grey;color:white;">DALAM PENGERJAAN</h3> -->
 									<h3 class="title">Pinjaman Terbesar</h3>
-									<h3 class="subtitle">Rp.50.000.000,00</h3>
+									<h3 class="subtitle">{{biggest_loan}}</h3>
 								</div>
 							</div>
 							</a>
@@ -54,8 +54,8 @@
 								</div>
 								<div class="post-info">
 									<!-- <h3 style="background-color:grey;color:white;">DALAM PENGERJAAN</h3> -->
-									<h3 class="title">Pinjaman Terlaris</h3>
-									<h3 class="subtitle">86 Akad</h3>
+									<h3 class="title">Pinjaman Dicairkan</h3>
+									<h3 class="subtitle">{{accepted_loan}} Akad</h3>
 								</div>
 							</div>
 							</a>
@@ -155,76 +155,76 @@
 					</div>
 				</div> -->
 
-				{{#if dashboard}}
-				<div class="title-bar mb-15">
-					<h3 class="dz-title my-5">Rincian Arus Kas</h3>
-					<!-- <a href="/deals/"><i class="flaticon-right"></i></a> -->
-				</div>
-				{{/if}}
+<!--				{{#if dashboard}}-->
+<!--				<div class="title-bar mb-15">-->
+<!--					<h3 class="dz-title my-5">Rincian Arus Kas</h3>-->
+<!--					&lt;!&ndash; <a href="/deals/"><i class="flaticon-right"></i></a> &ndash;&gt;-->
+<!--				</div>-->
+<!--				{{/if}}-->
 				{{#if dashboard}}
 				<div class="row">
-					<div class="col-50 medium-20">
-						<div class="item-box">
-							<div class="item-media">
-								<img src="img/categories/pic1.jpg" alt="">
-							</div>
-							<div class="item-content">
-								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>
-								<h3 class="title"><a href="#">Pemasukan Bulan ini</a></h3>
-							</div>
-						</div>
-					</div>
-					<div class="col-50 medium-20">
-						<div class="item-box">
-							<div class="item-media">
-								<img src="img/categories/pic2.jpg" alt="">
-							</div>
-							<div class="item-content">
-								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>
-								<h3 class="title"><a href="#">Pengeluaran Bulan ini</a></h3>
-							</div>
-						</div>
-					</div>
-					<div class="col-50 medium-20">
-						<div class="item-box">
-							<div class="item-media">
-								<img src="img/categories/pic3.jpg" alt="">
-							</div>
-							<div class="item-content">
-								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>
-								<h3 class="title"><a href="#">Saldo Bulan ini</a></h3>
-							</div>
-						</div>
-					</div>
-					<div class="col-50 medium-20">
-						<div class="item-box">
-							<div class="item-media">
-								<img src="img/categories/pic4.jpg" alt="">
-							</div>
-							<div class="item-content">
-								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>
-								<h3 class="title"><a href="#">Pemasukan Terbesar Bulan ini</a></h3>
-							</div>
-						</div>
-					</div>
-					<div class="col-50 medium-20">
-						<div class="item-box">
-							<div class="item-media">
-								<img src="img/categories/pic4.jpg" alt="">
-							</div>
-							<div class="item-content">
-								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>
-								<h3 class="title"><a href="#">Pengeluaran Terbesar Bulan ini</a></h3>
-							</div>
-						</div>
-					</div>
+<!--					<div class="col-50 medium-20">-->
+<!--						<div class="item-box">-->
+<!--							<div class="item-media">-->
+<!--								<img src="img/categories/pic1.jpg" alt="">-->
+<!--							</div>-->
+<!--							<div class="item-content">-->
+<!--								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>-->
+<!--								<h3 class="title"><a href="#">Pemasukan Bulan ini</a></h3>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="col-50 medium-20">-->
+<!--						<div class="item-box">-->
+<!--							<div class="item-media">-->
+<!--								<img src="img/categories/pic2.jpg" alt="">-->
+<!--							</div>-->
+<!--							<div class="item-content">-->
+<!--								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>-->
+<!--								<h3 class="title"><a href="#">Pengeluaran Bulan ini</a></h3>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="col-50 medium-20">-->
+<!--						<div class="item-box">-->
+<!--							<div class="item-media">-->
+<!--								<img src="img/categories/pic3.jpg" alt="">-->
+<!--							</div>-->
+<!--							<div class="item-content">-->
+<!--								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>-->
+<!--								<h3 class="title"><a href="#">Saldo Bulan ini</a></h3>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="col-50 medium-20">-->
+<!--						<div class="item-box">-->
+<!--							<div class="item-media">-->
+<!--								<img src="img/categories/pic4.jpg" alt="">-->
+<!--							</div>-->
+<!--							<div class="item-content">-->
+<!--								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>-->
+<!--								<h3 class="title"><a href="#">Pemasukan Terbesar Bulan ini</a></h3>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="col-50 medium-20">-->
+<!--						<div class="item-box">-->
+<!--							<div class="item-media">-->
+<!--								<img src="img/categories/pic4.jpg" alt="">-->
+<!--							</div>-->
+<!--							<div class="item-content">-->
+<!--								<h3 style="background-color: grey;color:white;">DALAM PENGERJAAN</h3>-->
+<!--								<h3 class="title"><a href="#">Pengeluaran Terbesar Bulan ini</a></h3>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
 
 					<div class="row">
-						<a href="/distributor/" class="button button-fill button-large col-100 mb-15">Manajemen Pengguna</a>
-						<a href="/product-type/" class="button button-fill button-large col-100 mb-15">Jenis Transaksi</a>
-						<a href="/product/" class="button button-fill button-large col-100 mb-15">Transaksi</a>
+<!--						<a href="/distributor/" class="button button-fill button-large col-100 mb-15">Manajemen Pengguna</a>-->
+<!--						<a href="/product-type/" class="button button-fill button-large col-100 mb-15">Jenis Transaksi</a>-->
+<!--						<a href="/product/" class="button button-fill button-large col-100 mb-15">Transaksi</a>-->
 						<!-- <a href="/product/" class="button button-fill button-large col-100 mb-15">Simpanan</a> -->
-						<a href="#" class="button button-fill button-large col-100 mb-15">Arus kas (DALAM PENGERJAAN)</a>
+<!--						<a href="#" class="button button-fill button-large col-100 mb-15">Arus kas (DALAM PENGERJAAN)</a>-->
 					</div>
 				</div>
 				{{/if}}
@@ -261,7 +261,7 @@
         </div>
         <div class="page-content">
           <div class="block">
-            <p>Pinjaman terkini, akad jual-beli sebesar Rp.4.650.000,00 pada Januari 2023</p>
+            <p>Pinjaman terkini, sebesar {{latest_loan}}</p>
           </div>
         </div>
       </div>
@@ -278,7 +278,7 @@
         </div>
         <div class="page-content">
           <div class="block">
-            <p>Pinjaman terbesar, pinjaman tunai sebesar Rp.50.000.000,00 pada Februari 2020</p>
+            <p>Pinjaman terbesar, sebesar {{biggest_loan}}</p>
           </div>
         </div>
       </div>
@@ -289,13 +289,13 @@
         <div class="navbar">
           <div class="navbar-bg"></div>
           <div class="navbar-inner">
-            <div class="title">Pinjaman Terlaris</div>
+            <div class="title">Pinjaman Dicairkan</div>
             <div class="right"><a href="#" class="link popup-close">Close</a></div>
           </div>
         </div>
         <div class="page-content">
           <div class="block">
-            <p>Pinjaman terlaris, Akad jual-beli terdapat 86 pinjaman</p>
+            <p>Pinjaman dicairkan, {{accepted_loan}} pinjaman sudah dicairkan</p>
           </div>
         </div>
       </div>
@@ -317,6 +317,9 @@
 				},
 				token: "",
 				dashboard: false,
+				biggest_loan: 0,
+				latest_loan: 0,
+				accepted_loan: 0,
 			}
 		},
 		methods: {},
@@ -324,27 +327,65 @@
 			pageInit: function () {
 				var self = this;
 
+				const rupiah = (number)=>{
+					return new Intl.NumberFormat("id-ID", {
+						style: "currency",
+						currency: "IDR"
+					}).format(number);
+				}
+
 				$('.item-bookmark').on('click', function (e) {
 					$(this).toggleClass('active');
 				});
 				let tmp = self.$root.tesBaca("user")
 				tmp = JSON.parse(tmp)
 
-				if(tmp === null || tmp.token === undefined || tmp.user === undefined){
+				if(tmp === null || tmp.user === undefined){
 					self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
 					return app.views.main.router.navigate('/signin/', {reloadAll: true});
 				}
 
-				let temp = false
-				if(tmp.user.role == 4){
-					temp = true
-				}
+				self.$app.request({
+					method: 'GET',
+					url: self.$root.getURL()+`dashboard`,
+					// headers: {
+					//   'Access-Control-Allow-Origin': '*',
+					//   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+					// },
+					contentType: 'application/json',
+					success: function (res) {
+						const data = JSON.parse(res)
 
-				self.$setState({
-					token: tmp.token,
-					user: tmp.user,
-					dashboard: temp
-				});
+						if (!data.status) {
+							self.$app.dialog.alert(data.message || "Error");
+							return
+						}
+
+						let temp = false
+						if(tmp.user.role == 4){
+							temp = true
+						}
+
+						self.$setState({
+							user: tmp.user,
+							dashboard: temp,
+							biggest_loan: rupiah(data.data.biggest_loan),
+							latest_loan: rupiah(data.data.latest_loan),
+							accepted_loan: data.data.accepted_loan
+						});
+					},
+					error: function (err) {
+						let msg = null
+						if (err.response) {
+							msg = JSON.parse(err.response)
+						}
+						self.$app.dialog.alert(msg.message || "Error");
+						self.$setState({
+							allowInfinite: false,
+							hasMoreItems: false
+						});
+					}
+				})
 			},
 			pageBeforeOut: function () {
 				var self = this;

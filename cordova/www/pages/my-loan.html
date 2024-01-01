@@ -79,7 +79,7 @@
         let lastIndexDatetime = self.list[self.list.length - 1].Datetime
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general?creditor=${tmp.user.name}&timestamp=${lastIndexDatetime}`,
+          url: self.$root.getURL()+`/loan-general?creditor=${tmp.user.name}&timestamp=${lastIndexDatetime}`,
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
@@ -158,7 +158,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general?creditor=${tmp.user.name}`,
+          url: self.$root.getURL()+`/loan-general?creditor=${tmp.user.name}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

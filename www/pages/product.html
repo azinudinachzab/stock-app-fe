@@ -30,26 +30,26 @@
         <div class="container">
           {{#each list}}
           <div class="card card-bx noti-area">
-            <div class="item-title"><i class="text-success"></i>Nama cicilan: {{Title}}</div>
-            <div class="item-title"><i class="text-success"></i>Jenis cicilan: {{LoanTypeName}}</div>
+            <div class="item-title"><i class="text-success"></i>Nama tagihan: {{Title}}</div>
+            <div class="item-title"><i class="text-success"></i>Jenis tagihan: {{LoanTypeName}}</div>
             <div class="item-title"><i class="text-success"></i>Jumlah total: {{Amount}}</div>
             <div class="item-title"><i class="text-success"></i>Tenor: {{Tenor}}</div>
             <!-- <div class="item-text">You has apply an job in Queenify Group as UI Designer</div> -->
             <div class="item-time">
               <div class="left">
-                {{#if "allowDelete"}}
-                <span class="text-dark" @click="delete({{ID}})"><h3><i class="fa fa-trash-o"></i>Delete</h3></span>
-                {{/if}}
+<!--                {{#if "allowDelete"}}-->
+<!--                <span class="text-dark" @click="delete({{ID}})"><h3><i class="fa fa-trash-o"></i>Delete</h3></span>-->
+<!--                {{/if}}-->
 
                 {{#js_if "this.Status==1"}}
                 <span class="left button button-fill color-green text-green"></span>
                 </br>
-                <span class="text-primary" @click="detailLoan({{ID}})">Detail cicilan</span>
+                <span class="text-primary" @click="detailLoan({{ID}})">Detail tagihan</span>
                 {{/js_if}}
 
-                {{#js_if "this.Status!=1"}}
-                <span @click="acceptLoan({{ID}})" class="left button button-fill color-red text-green"></span>
-                {{/js_if}}
+<!--                {{#js_if "this.Status!=1"}}-->
+<!--                <span @click="acceptLoan({{ID}})" class="left button button-fill color-red text-green"></span>-->
+<!--                {{/js_if}}-->
               </div>
             </div>
           </div>
@@ -87,7 +87,7 @@
         
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general?creditor=${e.target.value}`,
+          url: self.$root.getURL()+`/loan-general?creditor=${e.target.value}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -97,7 +97,7 @@
             const data = JSON.parse(res)
 
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -112,7 +112,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
             self.$setState({
               allowInfinite: false,
               hasMoreItems: false
@@ -123,12 +123,12 @@
       delete: function (id) {
         var self = this;
         self.$app.dialog.confirm(
-          "Apakah anda yakin ingin menghapus cicilan ini?",
+          "Apakah anda yakin ingin menghapus tagihan ini?",
           "Confirmation",
           function () {
             self.$app.request({
               method: 'DELETE',
-              url: `https://be.siskeubq.my.id/loan-general/${id}`,
+              url: self.$root.getURL()+`/loan-general/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -141,7 +141,7 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.data.error || "Error");
+                self.$app.dialog.alert(msg.message || "Error");
               }
             })
           }
@@ -162,12 +162,12 @@
         let lastIndexDatetime = self.list[self.list.length - 1].Datetime
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general?timestamp=${lastIndexDatetime}`,
+          url: self.$root.getURL()+`/loan-general?timestamp=${lastIndexDatetime}`,
           contentType: 'application/json',
           success: function (res) {
             const data = JSON.parse(res)
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -209,7 +209,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
             self.$setState({
               hasMoreItems: false
             });
@@ -224,7 +224,7 @@
           function () {
             self.$app.request({
               method: 'GET',
-              url: `https://be.siskeubq.my.id/loan-general/accept/${id}`,
+              url: self.$root.getURL()+`/loan-general/accept/${id}`,
               headers: {
                 'Authorization': `Bearer ${self.token}`,
               },
@@ -237,7 +237,7 @@
                 if (err.response) {
                   msg = JSON.parse(err.response)
                 }
-                self.$app.dialog.alert(msg.data.error || "Error");
+                self.$app.dialog.alert(msg.message || "Error");
               }
             })
           }
@@ -251,7 +251,7 @@
         let tmp = self.$root.tesBaca("user")
         tmp = JSON.parse(tmp)
 
-        if (tmp === null || tmp.token === undefined || tmp.user === undefined) {
+        if (tmp === null || tmp.user === undefined) {
           self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
           return app.views.main.router.navigate('/signin/', {
             reloadAll: true
@@ -265,7 +265,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-general`,
+          url: self.$root.getURL()+`/loan-general`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -275,7 +275,7 @@
             const data = JSON.parse(res)
 
             if (!data.status) {
-              self.$app.dialog.alert(data.data.error || "Error");
+              self.$app.dialog.alert(data.message || "Error");
               return
             }
 
@@ -297,7 +297,7 @@
             if (err.response) {
               msg = JSON.parse(err.response)
             }
-            self.$app.dialog.alert(msg.data.error || "Error");
+            self.$app.dialog.alert(msg.message || "Error");
             self.$setState({
               allowInfinite: false,
               hasMoreItems: false

@@ -66,7 +66,7 @@
             function () {
               self.$app.request({
                 method: 'GET',
-                url: `https://be.siskeubq.my.id/loan-detail/accept/${id}`,
+                url: self.$root.getURL()+`/loan-detail/accept/${id}`,
                 headers: {
                   'Authorization': `Bearer ${self.token}`,
                 },
@@ -115,7 +115,7 @@
 
         self.$app.request({
           method: 'GET',
-          url: `https://be.siskeubq.my.id/loan-detail/general/${id}`,
+          url: self.$root.getURL()+`/loan-detail/general/${id}`,
           // headers: {
           //   'Access-Control-Allow-Origin': '*',
           //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
