@@ -11,6 +11,11 @@ var routes = [
     url: './pages/about.html',
     name: 'about',
   },
+  {
+    path: '/admin/login',
+    url: './pages/admin/login.html',
+    name: 'admin-login',
+  },
   // Right Panel pages
   {
     path: '/panel-right-1/',
