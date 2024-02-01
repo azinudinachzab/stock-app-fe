@@ -203,6 +203,10 @@ var routes = [
     componentUrl: './pages/new-product.html',
   },
   {
+    path: '/social-fund/',
+    componentUrl: './pages/social-fund.html',
+  },
+  {
     path: '/my-loan/',
     componentUrl: './pages/my-loan.html',
   },

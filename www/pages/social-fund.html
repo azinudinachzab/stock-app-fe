@@ -1,0 +1,140 @@
+<template>
+    <div class="page">
+        <div class="page-content account-area">
+            <div class="fixed-content py-30">
+                <div class="container">
+                    <div class="tabs">
+                        <div class="tab tab-active form-elements tabs">
+                            <form class="tab tab-active" id="tabA1">
+                                <div class="title-bar mb-20">
+                                    <h3 class="dz-title ma-0">Ajukan Dana sosial</h3>
+                                    <a href="{{redirectURL}}" class="icon-close"><i class="flaticon-cancel"></i></a>
+                                </div>
+                                <div class="list mb-0">
+                                    <ul class="row">
+                                        <li class="item-content item-input col-100 item-input-with-value">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <input id="name" type="text" placeholder="Nama Pengajuan" id="demo-username-22"
+                                                           class="form-control" @input="inputName" value="{{name}}" required /> </br>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content item-input col-100 mb-15">
+                                            <div class="item-inner">
+                                                <div class="item-title">Jumlah Pengajuan</div>
+                                                <div class="item-input-wrap input-dropdown-wrap">
+                                                    <select @change="selectProductType" placeholder="Pilih Jenis Pinjaman" required>
+                                                        <option value="5000000">Rp. 500.000,00</option>
+                                                        <option value="10000000">Rp. 1.000.000,00</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="list">
+                                    <ul>
+                                        <li class="mb-15"><a @click="create" class="button-large button button-fill">Confirm</a></li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        // Component Data
+        data: function () {
+            // Must return an object
+            return {
+                name: null,
+                redirectURL: "/home/",
+                user_id: 0,
+                amount: parseFloat("5000000"),
+            }
+        },
+        // Component Methods
+        methods: {
+            create: function () {
+                var self = this;
+
+                self.$app.request({
+                    method: 'POST',
+                    url: self.$root.getURL()+'/social',
+                    data: {
+                        user_id: self.user_id,
+                        fund_type: 1,
+                        amount: parseFloat(self.amount),
+                    },
+                    // headers: {
+                    //   'Access-Control-Allow-Origin': '*',
+                    //   'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+                    // },
+                    contentType: 'application/json',
+                    success: function (res) {
+                        const data = JSON.parse(res)
+
+                        if (!data.status) {
+                            self.$app.dialog.alert(data.message || "Error");
+                            return
+                        }
+
+                        self.$app.dialog.alert("Dana sosial berhasil diajukan")
+                        return app.views.main.router.navigate(self.redirectURL);
+                    },
+                    error: function (err) {
+                        let msg = null
+                        if (err.response) {
+                            msg = JSON.parse(err.response)
+                        }
+                        self.$app.dialog.alert(msg.message || "Error");
+                    }
+                })
+            },
+            selectProductType: function (e) {
+                let self = this;
+                const val = parseFloat(e.target.value);
+                self.$setState({
+                    amount: val,
+                })
+            },
+            inputName: function (e) {
+                let self = this;
+                self.$setState({
+                    name: e.target.value,
+                });
+            },
+        },
+        on: {
+            pageInit: function () {
+                let self = this;
+
+                let tmp = self.$root.tesBaca("user")
+                tmp = JSON.parse(tmp)
+
+                if (tmp === null || tmp.user === undefined) {
+                    self.$app.dialog.alert("Mohon login terlebih dahulu" || "Error");
+                    return app.views.main.router.navigate('/signin/', {
+                        reloadAll: true
+                    });
+                }
+
+                let temp = "/home/"
+                if (tmp.user.role == 4) {
+                    temp = "/product/"
+                }
+
+                self.$setState({
+                    redirectURL: temp,
+                    user_id: tmp.user.id
+                });
+            },
+        }
+    }
+</script>
